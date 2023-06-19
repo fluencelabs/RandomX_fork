@@ -36,23 +36,29 @@ namespace randomx {
 
 	template<size_t alignment>
 	void* AlignedAllocator<alignment>::allocMemory(size_t count) {
-		void *mem = rx_aligned_alloc(count, alignment);
-		if (mem == nullptr)
-			throw std::bad_alloc();
+		//void *mem = rx_aligned_alloc(count, alignment);
+    void *mem = malloc(count);
+		if (mem == nullptr) {
+      abort();
+      //throw std::bad_alloc();
+    }
 		return mem;
 	}
 
 	template<size_t alignment>
 	void AlignedAllocator<alignment>::freeMemory(void* ptr, size_t count) {
-		rx_aligned_free(ptr);
+		//rx_aligned_free(ptr);
+    free(ptr);
 	}
 
 	template struct AlignedAllocator<CacheLineSize>;
 
 	void* LargePageAllocator::allocMemory(size_t count) {
 		void *mem = allocLargePagesMemory(count);
-		if (mem == nullptr)
-			throw std::bad_alloc();
+		if (mem == nullptr) {
+      abort();
+      //throw std::bad_alloc();
+    }
 		return mem;
 	}
 

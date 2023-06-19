@@ -49,6 +49,7 @@ src/superscalar.cpp
 src/vm_compiled.cpp
 src/vm_interpreted_light.cpp
 src/argon2_core.c
+        src/launcher.cpp
 src/blake2_generator.cpp
 src/instructions_portable.cpp
 src/reciprocal.c
