@@ -1,6 +1,0 @@
-/Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_MAKE_PROGRAM=/Applications/CLion.app/Contents/bin/ninja/mac/ninja -G Ninja -S /Users/mike/dev/work/fluence/randomx_wasm -B /Users/mike/dev/work/fluence/randomx_wasm/cmake-build-debug
--- Setting CXX flag -maes
--- Setting C flag -maes
--- Configuring done
--- Generating done
--- Build files have been written to: /Users/mike/dev/work/fluence/randomx_wasm/cmake-build-debug

@@ -9,3 +9,4 @@ Debug/
 build/
 *.wasm
 *.wat
+.idea/*
