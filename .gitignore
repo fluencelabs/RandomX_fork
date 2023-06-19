@@ -10,3 +10,4 @@ build/
 *.wasm
 *.wat
 .idea/*
+cmake-build-debug/*
