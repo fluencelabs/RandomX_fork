@@ -286,7 +286,6 @@ namespace randomx {
 				return (gen.getByte() & 1) ? &decodeBuffer484 : &decodeBuffer493;
 
 			//Default: select a random fetch configuration.
-      auto t = fetchNextDefault(gen);
 			return fetchNextDefault(gen);
 		}
 	private:

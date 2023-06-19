@@ -64,13 +64,6 @@ extern "C" {
 	}
 
 	randomx_cache *randomx_alloc_cache(randomx_flags flags) {
-    std::cout
-     << "randomX: randomx_alloc_cache "
-     << flags
-     << " "
-     << (flags & (RANDOMX_FLAG_JIT | RANDOMX_FLAG_LARGE_PAGES))
-     << std::endl;
-
 		randomx_cache *cache = nullptr;
 		auto impl = randomx::selectArgonImpl(flags);
 		if (impl == nullptr) {
@@ -83,7 +76,6 @@ extern "C" {
 			cache->argonImpl = impl;
 			switch ((int)(flags & (RANDOMX_FLAG_JIT | RANDOMX_FLAG_LARGE_PAGES))) {
 				case RANDOMX_FLAG_DEFAULT:
-          std::cout << "inside initialization " << &randomx::initCache << std::endl;
 					cache->dealloc = &randomx::deallocCache<randomx::DefaultAllocator>;
 					cache->jit = nullptr;
 					cache->initialize = &randomx::initCache;
@@ -143,7 +135,6 @@ extern "C" {
 		std::string cacheKey;
 		cacheKey.assign((const char *)key, keySize);
 		if (cache->cacheKey != cacheKey || !cache->isInitialized()) {
-      std::cout << "randomx_init_cache" << std::endl;
 			cache->initialize(cache, key, keySize);
 			cache->cacheKey = cacheKey;
 		}

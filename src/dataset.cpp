@@ -75,8 +75,6 @@ namespace randomx {
 		argon2_instance_t instance;
 		argon2_context context;
 
-    printf("initCache\n");
-
 		context.out = nullptr;
 		context.outlen = 0;
 		context.pwd = CONST_CAST(uint8_t *)key;
@@ -126,15 +124,12 @@ namespace randomx {
 		 */
 		randomx_argon2_initialize(&instance, &context);
 
-    printf("after randomx_argon2_initialize\n");
-
 		randomx_argon2_fill_memory_blocks(&instance);
 
 		cache->reciprocalCache.clear();
 		randomx::Blake2Generator gen(key, keySize);
 		for (int i = 0; i < RANDOMX_CACHE_ACCESSES; ++i) {
 			randomx::generateSuperscalar(cache->programs[i], gen);
-      printf("  %d %d\n", i, cache->programs[i].getSize());
 
       for (unsigned j = 0; j < cache->programs[i].getSize(); ++j) {
 				auto& instr = cache->programs[i](j);

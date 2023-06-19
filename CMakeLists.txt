@@ -220,6 +220,13 @@ target_link_libraries(randomx-benchmark
   PRIVATE randomx
   PRIVATE ${CMAKE_THREAD_LIBS_INIT})
 
+add_executable(runner
+        src/tests/api-example1.c
+        )
+target_link_libraries(runner
+        PRIVATE randomx
+        PRIVATE ${CMAKE_THREAD_LIBS_INIT})
+
 include(CheckCXXSourceCompiles)
 check_cxx_source_compiles("
 #include <cstdint>

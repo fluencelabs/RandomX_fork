@@ -11,3 +11,4 @@ build/
 *.wat
 .idea/*
 cmake-build-debug/*
+wasi-sdk/*
