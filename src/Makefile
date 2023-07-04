@@ -1,7 +1,6 @@
 TOOLCHAIN_PREFIX ?= riscv32-unknown-elf-
 
 RANDOMX_SRC = \
-	launcher.cpp\
 	randomx.cpp\
 	vm_interpreted_light.cpp\
 	vm_interpreted.cpp\
