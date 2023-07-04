@@ -40,6 +40,7 @@ CFLAGS := -march=rv32im -mabi=ilp32 -Wl,--gc-sections $(OPTFLAGS) $(UBFLAGS) \
          	-nostdlib \
          	-fno-exceptions \
          	-mstrict-align \
+		--sysroot=/opt/riscv/riscv32-unknown-elf \
          	-mcmodel=medany -static -fvisibility=hidden
 
 CXXFLAGS := -std=c++17 -fno-rtti
