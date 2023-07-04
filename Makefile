@@ -1,11 +1,4 @@
-TARGET = randomx
-CXX = ./wasi-sdk/bin/clang++
-SYSROOT = ./wasi-sdk/share/wasi-sysroot
-TARGET_TRIPLE = wasm32-wasi
-CFLAGS = -fvisibility=hidden
-LDFLAGS = -Wl,--demangle,--allow-undefined
-EXPORT_FUNCS = \
-	--export=test_randomx
+TOOLCHAIN_PREFIX ?= riscv32-unknown-elf-
 
 RANDOMX_SRC = \
 	src/launcher.cpp\
@@ -26,18 +19,49 @@ RANDOMX_SRC = \
 	src/blake2/blake2b.c\
 	src/blake2_generator.cpp
 
-RANDOMX_FLAGS = \
-	-fno-exceptions
+CC := $(TOOLCHAIN_PREFIX)gcc
+LD := $(TOOLCHAIN_PREFIX)ld
+CXX := $(TOOLCHAIN_PREFIX)g++
+OBJCOPY := $(TOOLCHAIN_PREFIX)objcopy
+OBJDUMP := $(TOOLCHAIN_PREFIX)objdump
 
-.PHONY: default all clean
+# Link time optimizations
+ifeq ($(lto),yes)
+OPTFLAGS+=-flto=auto
+endif
+
+UBFLAGS := -fno-strict-aliasing -fno-strict-overflow -fno-delete-null-pointer-checks
+
+CFLAGS := -march=rv32im -mabi=ilp32 -Wl,--gc-sections $(OPTFLAGS) $(UBFLAGS) \
+         	-DMICROARCHITECTURE=1 \
+         	-DAVOID_NATIVE_UINT128_T=1 \
+         	-ffreestanding \
+         	-nostartfiles \
+         	-nostdlib \
+         	-fno-exceptions \
+         	-mstrict-align \
+         	-mcmodel=medany -static -fvisibility=hidden
+
+CXXFLAGS := -std=c++17 -fno-rtti
 
 default: $(TARGET)
 all: default
 
-$(TARGET): $(RANDOMX_SRC)
-	$(CXX) -O3 --sysroot=$(SYSROOT) --target=$(TARGET_TRIPLE) $(RANDOMX_FLAGS) $(CFLAGS) $(LDFLAGS) -Wl,$(EXPORT_FUNCS) $^ -o $@.wasm
+RANDOMX_OBJS = $(patsubst %.c,%.randomx_c.o,$(patsubst %.cpp,%.randomx_cpp.o,$(RANDOMX_SRC)))
+TARGETS=$(RANDOMX_OBJS)
 
-.PRECIOUS: $(TARGET)
+.PHONY: default all clean
+
+all: $(TARGETS) randomx_combined.o
+
+%.randomx_c.o: %.c
+	$(CC) $(CFLAGS) -c -o $@ $(<F)
+
+%.randomx_cpp.o: %.cpp
+	$(CXX) $(CXXFLAGS) $(CFLAGS) -c -o $A $(<F)
+
+randomx_combined.o: $(RANDOMX_OBJS)
+	$(LD) -relocatable $(RANDOMX_OBJS) -o randomx_combined.o
 
 clean:
-	-rm -f $(TARGET).wasm
+	rm -f *.ld *.elf *.bin *.tmp link.ld *.o *.a
