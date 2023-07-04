@@ -58,7 +58,7 @@ all: $(TARGETS) randomx_combined.o
 	$(CC) $(CFLAGS) -c -o $@ $(<F)
 
 %.randomx_cpp.o: %.cpp
-	$(CXX) $(CXXFLAGS) $(CFLAGS) -c -o $A $(<F)
+	$(CXX) $(CXXFLAGS) $(CFLAGS) -c -o $@ $(<F)
 
 randomx_combined.o: $(RANDOMX_OBJS)
 	$(LD) -relocatable $(RANDOMX_OBJS) -o randomx_combined.o
