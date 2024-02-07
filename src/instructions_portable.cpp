@@ -139,6 +139,7 @@ void rx_reset_float_state() {
 }
 
 void rx_set_rounding_mode(uint32_t mode) {
+    /*
 	switch (mode & 3) {
 	case RoundDown:
 		setRoundMode_(FE_DOWNWARD);
@@ -155,9 +156,11 @@ void rx_set_rounding_mode(uint32_t mode) {
 	default:
 		UNREACHABLE;
 	}
+     */
 }
 
 uint32_t rx_get_rounding_mode() {
+    /*
 	switch (fegetround()) {
 	case FE_DOWNWARD:
 		return RoundDown;
@@ -170,6 +173,8 @@ uint32_t rx_get_rounding_mode() {
 	default:
 		UNREACHABLE;
 	}
+     */
+    return 0;
 }
 
 #endif

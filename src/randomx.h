@@ -126,6 +126,8 @@ RANDOMX_EXPORT void randomx_init_cache(randomx_cache *cache, const void *key, si
 */
 RANDOMX_EXPORT void randomx_release_cache(randomx_cache* cache);
 
+RANDOMX_EXPORT void test_randomx();
+
 /**
  * Creates a randomx_dataset structure and allocates memory for RandomX Dataset.
  *

@@ -277,8 +277,9 @@ namespace randomx {
 
 			//To make sure that the multiplication port is saturated, a 4-4-4-4 configuration is generated if the number of multiplications
 			//is lower than the number of cycles.
-			if (mulCount < cycle + 1)
-				return &decodeBuffer4444;
+			if (mulCount < cycle + 1) {
+        return &decodeBuffer4444;
+      }
 
 			//If the current RandomX instruction is "IMUL_RCP", the next buffer must begin with a 4-byte slot for multiplication.
 			if(instrType == SuperscalarInstructionType::IMUL_RCP)
@@ -682,7 +683,9 @@ namespace randomx {
 			if (trace) std::cout << "; ------------- fetch cycle " << cycle << " (" << decodeBuffer->getName() << ")" << std::endl;
 
 			int bufferIndex = 0;
-			
+
+      // printf("decodeCycle: %d %d < %d\n", decodeCycle, bufferIndex, decodeBuffer->getSize());
+
 			//fill all instruction slots in the current decode buffer
 			while (bufferIndex < decodeBuffer->getSize()) {
 				int topCycle = cycle;

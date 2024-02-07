@@ -1,0 +1,8 @@
+version: '3'
+services:
+  randomx_wasm:
+    build:
+      context: .
+    container_name: randomx_wasm_builder1
+    volumes:
+     - ./:/code

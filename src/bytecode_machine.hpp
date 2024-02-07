@@ -208,48 +208,48 @@ namespace randomx {
 			*ibc.idst = temp;
 		}
 
-		static void exe_FSWAP_R(RANDOMX_EXE_ARGS) {
-			*ibc.fdst = rx_swap_vec_f128(*ibc.fdst);
-		}
+  static void exe_FSWAP_R(RANDOMX_EXE_ARGS) {
+    *ibc.fdst = rx_swap_vec_f128(*ibc.fdst);
+  }
 
-		static void exe_FADD_R(RANDOMX_EXE_ARGS) {
-			*ibc.fdst = rx_add_vec_f128(*ibc.fdst, *ibc.fsrc);
-		}
+  static void exe_FADD_R(RANDOMX_EXE_ARGS) {
+    *ibc.fdst = rx_add_vec_f128(*ibc.fdst, *ibc.fsrc);
+  }
 
-		static void exe_FADD_M(RANDOMX_EXE_ARGS) {
-			rx_vec_f128 fsrc = rx_cvt_packed_int_vec_f128(getScratchpadAddress(ibc, scratchpad));
-			*ibc.fdst = rx_add_vec_f128(*ibc.fdst, fsrc);
-		}
+  static void exe_FADD_M(RANDOMX_EXE_ARGS) {
+    rx_vec_f128 fsrc = rx_cvt_packed_int_vec_f128(getScratchpadAddress(ibc, scratchpad));
+    *ibc.fdst = rx_add_vec_f128(*ibc.fdst, fsrc);
+  }
 
-		static void exe_FSUB_R(RANDOMX_EXE_ARGS) {
-			*ibc.fdst = rx_sub_vec_f128(*ibc.fdst, *ibc.fsrc);
-		}
+  static void exe_FSUB_R(RANDOMX_EXE_ARGS) {
+    *ibc.fdst = rx_sub_vec_f128(*ibc.fdst, *ibc.fsrc);
+  }
 
-		static void exe_FSUB_M(RANDOMX_EXE_ARGS) {
-			rx_vec_f128 fsrc = rx_cvt_packed_int_vec_f128(getScratchpadAddress(ibc, scratchpad));
-			*ibc.fdst = rx_sub_vec_f128(*ibc.fdst, fsrc);
-		}
+  static void exe_FSUB_M(RANDOMX_EXE_ARGS) {
+    rx_vec_f128 fsrc = rx_cvt_packed_int_vec_f128(getScratchpadAddress(ibc, scratchpad));
+    *ibc.fdst = rx_sub_vec_f128(*ibc.fdst, fsrc);
+  }
 
-		static void exe_FSCAL_R(RANDOMX_EXE_ARGS) {
-			const rx_vec_f128 mask = rx_set1_vec_f128(0x80F0000000000000);
-			*ibc.fdst = rx_xor_vec_f128(*ibc.fdst, mask);
-		}
+  static void exe_FSCAL_R(RANDOMX_EXE_ARGS) {
+    const rx_vec_f128 mask = rx_set1_vec_f128(0x80F0000000000000);
+    *ibc.fdst = rx_xor_vec_f128(*ibc.fdst, mask);
+  }
 
-		static void exe_FMUL_R(RANDOMX_EXE_ARGS) {
-			*ibc.fdst = rx_mul_vec_f128(*ibc.fdst, *ibc.fsrc);
-		}
+  static void exe_FMUL_R(RANDOMX_EXE_ARGS) {
+    *ibc.fdst = rx_mul_vec_f128(*ibc.fdst, *ibc.fsrc);
+  }
 
-		static void exe_FDIV_M(RANDOMX_EXE_ARGS) {
-			rx_vec_f128 fsrc = maskRegisterExponentMantissa(
-				config,
-				rx_cvt_packed_int_vec_f128(getScratchpadAddress(ibc, scratchpad))
-			);
-			*ibc.fdst = rx_div_vec_f128(*ibc.fdst, fsrc);
-		}
+  static void exe_FDIV_M(RANDOMX_EXE_ARGS) {
+    rx_vec_f128 fsrc = maskRegisterExponentMantissa(
+      config,
+      rx_cvt_packed_int_vec_f128(getScratchpadAddress(ibc, scratchpad))
+    );
+    *ibc.fdst = rx_div_vec_f128(*ibc.fdst, fsrc);
+  }
 
-		static void exe_FSQRT_R(RANDOMX_EXE_ARGS) {
-			*ibc.fdst = rx_sqrt_vec_f128(*ibc.fdst);
-		}
+  static void exe_FSQRT_R(RANDOMX_EXE_ARGS) {
+    *ibc.fdst = rx_sqrt_vec_f128(*ibc.fdst);
+  }
 
 		static void exe_CBRANCH(RANDOMX_EXE_ARGS) {
 			*ibc.idst += ibc.imm;
@@ -259,7 +259,7 @@ namespace randomx {
 		}
 
 		static void exe_CFROUND(RANDOMX_EXE_ARGS) {
-			rx_set_rounding_mode(rotr(*ibc.isrc, ibc.imm) % 4);
+			//rx_set_rounding_mode(rotr(*ibc.isrc, ibc.imm) % 4);
 		}
 
 		static void exe_ISTORE(RANDOMX_EXE_ARGS) {

@@ -26,44 +26,49 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <new>
-#include "allocator.hpp"
-#include "intrin_portable.h"
-#include "virtual_memory.h"
+#include "launcher.h"
+#include "randomx.h"
+#include <iostream>
+#include <vector>
+#include "dataset.hpp"
 #include "common.hpp"
 
-namespace randomx {
+int main() {
+  test_randomx();
 
-	template<size_t alignment>
-	void* AlignedAllocator<alignment>::allocMemory(size_t count) {
-		//void *mem = rx_aligned_alloc(count, alignment);
-    void *mem = malloc(count);
-		if (mem == nullptr) {
-      abort();
-      //throw std::bad_alloc();
-    }
-		return mem;
-	}
+  return 0;
+}
 
-	template<size_t alignment>
-	void AlignedAllocator<alignment>::freeMemory(void* ptr, size_t count) {
-		//rx_aligned_free(ptr);
-    free(ptr);
-	}
+void test_randomx() {
+  std::cout << "randomX: start" << std::endl;
 
-	template struct AlignedAllocator<CacheLineSize>;
+  // RANDOMX_FLAG_DEFAULT must be set, because others flags could use features like large pages
+  randomx_flags flags = RANDOMX_FLAG_DEFAULT;
+  randomx_cache *cache = randomx_alloc_cache(flags);
+  if (cache == nullptr) {
+    std::cout << "randomX: can't allocate a cache" << std::endl;
+  }
 
-	void* LargePageAllocator::allocMemory(size_t count) {
-		void *mem = allocLargePagesMemory(count);
-		if (mem == nullptr) {
-      abort();
-      //throw std::bad_alloc();
-    }
-		return mem;
-	}
+  std::cout << "randomX: cache created " << cache << std::endl;
 
-	void LargePageAllocator::freeMemory(void* ptr, size_t count) {
-		freePagedMemory(ptr, count);
-	};
+  const char seed[] = "RandomX example key";
+  randomx_init_cache(cache, &seed, sizeof(seed));
+  std::cout << "randomX: cache " << cache << " " << cache->isInitialized() << std::endl;
 
+  randomx_vm *vm = randomx_create_vm(flags, cache, nullptr);
+
+  std::cout << "randomX: vm created " << vm << std::endl;
+
+  char hash[RANDOMX_HASH_SIZE];
+  const char input[] = "RandomX example input";
+  randomx_calculate_hash(vm, &input, sizeof input, hash);
+
+  randomx_destroy_vm(vm);
+  randomx_release_cache(cache);
+
+  for (unsigned i = 0; i < RANDOMX_HASH_SIZE; ++i) {
+    printf("%02x", hash[i] & 0xff);
+  }
+
+  printf("\n");
 }

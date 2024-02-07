@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "blake2/endian.h"
 #include "argon2.h"
 #include "argon2_core.h"
-#include "jit_compiler.hpp"
+// #include "jit_compiler.hpp"
 #include "intrin_portable.h"
 
 static_assert(RANDOMX_ARGON_MEMORY % (RANDOMX_ARGON_LANES * ARGON2_SYNC_POINTS) == 0, "RANDOMX_ARGON_MEMORY - invalid value");
@@ -61,8 +61,10 @@ namespace randomx {
 	void deallocCache(randomx_cache* cache) {
 		if (cache->memory != nullptr)
 			Allocator::freeMemory(cache->memory, CacheSize);
+    /*
 		if (cache->jit != nullptr)
 			delete cache->jit;
+     */
 	}
 
 	template void deallocCache<DefaultAllocator>(randomx_cache* cache);
@@ -128,7 +130,8 @@ namespace randomx {
 		randomx::Blake2Generator gen(key, keySize);
 		for (int i = 0; i < RANDOMX_CACHE_ACCESSES; ++i) {
 			randomx::generateSuperscalar(cache->programs[i], gen);
-			for (unsigned j = 0; j < cache->programs[i].getSize(); ++j) {
+
+      for (unsigned j = 0; j < cache->programs[i].getSize(); ++j) {
 				auto& instr = cache->programs[i](j);
 				if ((SuperscalarInstructionType)instr.opcode == SuperscalarInstructionType::IMUL_RCP) {
 					auto rcp = randomx_reciprocal(instr.getImm32());
@@ -141,10 +144,12 @@ namespace randomx {
 
 	void initCacheCompile(randomx_cache* cache, const void* key, size_t keySize) {
 		initCache(cache, key, keySize);
+    /*
 		cache->jit->enableWriting();
 		cache->jit->generateSuperscalarHash(cache->programs, cache->reciprocalCache);
 		cache->jit->generateDatasetInitCode();
 		cache->jit->enableExecution();
+     */
 	}
 
 	constexpr uint64_t superscalarMul0 = 6364136223846793005ULL;
