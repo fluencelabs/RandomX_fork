@@ -30,6 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "dataset.hpp"
 #include "vm_interpreted.hpp"
 #include "vm_interpreted_light.hpp"
+#include "vm_interpreted_micro.hpp"
 #include "vm_compiled.hpp"
 #include "vm_compiled_light.hpp"
 #include "blake2/blake2.h"
@@ -109,6 +110,13 @@ extern "C" {
 					cache->memory = (uint8_t*)randomx::LargePageAllocator::allocMemory(randomx::CacheSize);
 					break;
 
+                // case RANDOMX_FLAG_MICRO:
+				// 	cache->dealloc = &randomx::deallocCache<randomx::DummyAllocator>;
+				// 	cache->jit = nullptr;
+				// 	cache->initialize = nullptr;
+				// 	cache->datasetInit = nullptr;
+				// 	cache->memory = nullptr;
+				// 	break;
 				default:
 					UNREACHABLE;
 			}
@@ -337,6 +345,43 @@ extern "C" {
 
 		return vm;
 	}
+
+	randomx_vm *randomx_create_micro_vm(randomx_flags flags, randomx_cache *cache, randomx_dataset *dataset) {
+		assert(cache != nullptr || (flags & RANDOMX_FLAG_FULL_MEM));
+		assert(cache == nullptr || cache->isInitialized());
+		assert(dataset != nullptr || !(flags & RANDOMX_FLAG_FULL_MEM));
+
+		randomx_vm *vm = nullptr;
+
+		try {
+			switch ((int)(flags & RANDOMX_FLAG_MICRO)) {
+				case RANDOMX_FLAG_MICRO:
+					vm = new randomx::InterpretedMicroVmDefault();
+					break;
+
+				default:
+					UNREACHABLE;
+			}
+
+			if(cache != nullptr) {
+				vm->setCache(cache);
+				vm->cacheKey = cache->cacheKey;
+			}
+
+			if(dataset != nullptr)
+				vm->setDataset(dataset);
+
+			vm->allocate();
+		}
+		catch (std::exception &ex) {
+			delete vm;
+			vm = nullptr;
+		}
+
+		return vm;
+	}
+
+
 
 	void randomx_vm_set_cache(randomx_vm *machine, randomx_cache* cache) {
 		assert(machine != nullptr);

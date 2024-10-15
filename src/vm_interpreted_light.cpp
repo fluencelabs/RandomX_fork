@@ -44,8 +44,12 @@ namespace randomx {
 		
 		initDatasetItem(cachePtr, (uint8_t*)rl, itemNumber);
 
+		memcpy(&cachePtr->microCache[microCacheReadOffset], rl, sizeof(rl));
+
 		for (unsigned q = 0; q < 8; ++q)
 			r[q] ^= rl[q];
+
+		microCacheReadOffset += sizeof(rl);
 	}
 
 	template class InterpretedLightVm<AlignedAllocator<CacheLineSize>, false>;

@@ -26,46 +26,30 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <new>
-#include "allocator.hpp"
-#include "intrin_portable.h"
-#include "virtual_memory.h"
-#include "common.hpp"
+#include "vm_interpreted_micro.hpp"
+#include "dataset.hpp"
 
 namespace randomx {
 
-	template<size_t alignment>
-	void* AlignedAllocator<alignment>::allocMemory(size_t count) {
-		void *mem = rx_aligned_alloc(count, alignment);
-		if (mem == nullptr)
-			throw std::bad_alloc();
-		return mem;
+	template<class Allocator, bool softAes>
+	void InterpretedMicroVm<Allocator, softAes>::setCache(randomx_cache* cache) {
+		cachePtr = cache;
+		mem.memory = cache->memory;
 	}
 
-	template<size_t alignment>
-	void AlignedAllocator<alignment>::freeMemory(void* ptr, size_t count) {
-		rx_aligned_free(ptr);
+	template<class Allocator, bool softAes>
+	void InterpretedMicroVm<Allocator, softAes>::datasetRead(uint64_t address, int_reg_t(&r)[8]) {
+		uint32_t itemNumber = address / CacheLineSize;
+        int_reg_t* rl = (int_reg_t*)&cachePtr->microCache[microCacheReadOffset];
+
+		for (unsigned q = 0; q < 8; ++q)
+			r[q] ^= rl[q];
+    
+        microCacheReadOffset += sizeof(rl);
 	}
 
-	template struct AlignedAllocator<CacheLineSize>;
-
-	void* LargePageAllocator::allocMemory(size_t count) {
-		void *mem = allocLargePagesMemory(count);
-		if (mem == nullptr)
-			throw std::bad_alloc();
-		return mem;
-	}
-
-	void LargePageAllocator::freeMemory(void* ptr, size_t count) {
-		freePagedMemory(ptr, count);
-	};
-
-
-	void* DummyAllocator::allocMemory(size_t count) {
-		return nullptr;
-	}
-
-	void DummyAllocator::freeMemory(void* ptr, size_t count) {
-		
-	};
+	template class InterpretedMicroVm<AlignedAllocator<CacheLineSize>, false>;
+	template class InterpretedMicroVm<AlignedAllocator<CacheLineSize>, true>;
+	template class InterpretedMicroVm<LargePageAllocator, false>;
+	template class InterpretedMicroVm<LargePageAllocator, true>;
 }

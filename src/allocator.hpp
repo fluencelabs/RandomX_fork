@@ -43,4 +43,8 @@ namespace randomx {
 		static void freeMemory(void*, size_t);
 	};
 
+    struct DummyAllocator {
+		static void* allocMemory(size_t);
+		static void freeMemory(void*, size_t);
+	};
 }

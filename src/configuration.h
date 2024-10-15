@@ -56,16 +56,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define RANDOMX_PROGRAM_SIZE       256
 
 //Number of iterations during VM execution.
-#define RANDOMX_PROGRAM_ITERATIONS 2048
+#define RANDOMX_PROGRAM_ITERATIONS 512
 
 //Number of chained VM executions per hash.
-#define RANDOMX_PROGRAM_COUNT      8
+#define RANDOMX_PROGRAM_COUNT      4
 
 //Scratchpad L3 size in bytes. Must be a power of 2.
-#define RANDOMX_SCRATCHPAD_L3      2097152
+#define RANDOMX_SCRATCHPAD_L3      131072
 
 //Scratchpad L2 size in bytes. Must be a power of two and less than or equal to RANDOMX_SCRATCHPAD_L3.
-#define RANDOMX_SCRATCHPAD_L2      262144
+#define RANDOMX_SCRATCHPAD_L2      65536
 
 //Scratchpad L1 size in bytes. Must be a power of two (minimum 64) and less than or equal to RANDOMX_SCRATCHPAD_L2.
 #define RANDOMX_SCRATCHPAD_L1      16384

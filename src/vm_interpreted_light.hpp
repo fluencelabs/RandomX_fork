@@ -52,6 +52,9 @@ namespace randomx {
 	protected:
 		void datasetRead(uint64_t address, int_reg_t(&r)[8]) override;
 		void datasetPrefetch(uint64_t address) override { }
+	
+	private:
+		uint64_t microCacheReadOffset = 0;
 	};
 
 	using InterpretedLightVmDefault = InterpretedLightVm<AlignedAllocator<CacheLineSize>, true>;

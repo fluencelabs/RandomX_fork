@@ -26,46 +26,35 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#pragma once
+
 #include <new>
-#include "allocator.hpp"
-#include "intrin_portable.h"
-#include "virtual_memory.h"
-#include "common.hpp"
+#include "vm_interpreted.hpp"
 
 namespace randomx {
 
-	template<size_t alignment>
-	void* AlignedAllocator<alignment>::allocMemory(size_t count) {
-		void *mem = rx_aligned_alloc(count, alignment);
-		if (mem == nullptr)
-			throw std::bad_alloc();
-		return mem;
-	}
-
-	template<size_t alignment>
-	void AlignedAllocator<alignment>::freeMemory(void* ptr, size_t count) {
-		rx_aligned_free(ptr);
-	}
-
-	template struct AlignedAllocator<CacheLineSize>;
-
-	void* LargePageAllocator::allocMemory(size_t count) {
-		void *mem = allocLargePagesMemory(count);
-		if (mem == nullptr)
-			throw std::bad_alloc();
-		return mem;
-	}
-
-	void LargePageAllocator::freeMemory(void* ptr, size_t count) {
-		freePagedMemory(ptr, count);
+	template<class Allocator, bool softAes>
+	class InterpretedMicroVm : public InterpretedVm<Allocator, softAes> {
+	public:
+		using VmBase<Allocator, softAes>::mem;
+		using VmBase<Allocator, softAes>::cachePtr;
+		void* operator new(size_t size) {
+			void* ptr = AlignedAllocator<CacheLineSize>::allocMemory(size);
+			if (ptr == nullptr)
+				throw std::bad_alloc();
+			return ptr;
+		}
+		void operator delete(void* ptr) {
+			AlignedAllocator<CacheLineSize>::freeMemory(ptr, sizeof(InterpretedMicroVm));
+		}
+		void setDataset(randomx_dataset* dataset) override { }
+		void setCache(randomx_cache* cache) override;
+	protected:
+		void datasetRead(uint64_t address, int_reg_t(&r)[8]) override;
+		void datasetPrefetch(uint64_t address) override { }
+    private:
+		uint64_t microCacheReadOffset = 0;
 	};
 
-
-	void* DummyAllocator::allocMemory(size_t count) {
-		return nullptr;
-	}
-
-	void DummyAllocator::freeMemory(void* ptr, size_t count) {
-		
-	};
+	using InterpretedMicroVmDefault = InterpretedMicroVm<AlignedAllocator<CacheLineSize>, true>;
 }

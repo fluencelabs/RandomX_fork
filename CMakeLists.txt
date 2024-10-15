@@ -48,6 +48,7 @@ src/randomx.cpp
 src/superscalar.cpp
 src/vm_compiled.cpp
 src/vm_interpreted_light.cpp
+src/vm_interpreted_micro.cpp
 src/argon2_core.c
 src/blake2_generator.cpp
 src/instructions_portable.cpp
@@ -254,6 +255,11 @@ add_executable(randomx-benchmark
 target_link_libraries(randomx-benchmark
   PRIVATE randomx
   PRIVATE ${CMAKE_THREAD_LIBS_INIT})
+
+add_executable(randomx-micro-mode-runner
+  src/tests/micro-mode-runner.cpp)
+target_link_libraries(randomx-micro-mode-runner
+  PRIVATE randomx)
 
 include(CheckCXXSourceCompiles)
 check_cxx_source_compiles("

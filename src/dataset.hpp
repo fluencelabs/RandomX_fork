@@ -45,6 +45,8 @@ struct randomx_dataset {
 /* Global scope for C binding */
 struct randomx_cache {
 	uint8_t* memory = nullptr;
+	uint8_t* microCache = nullptr;
+
 	randomx::CacheDeallocFunc* dealloc;
 	randomx::JitCompiler* jit;
 	randomx::CacheInitializeFunc* initialize;

@@ -48,7 +48,8 @@ typedef enum {
   RANDOMX_FLAG_SECURE = 16,
   RANDOMX_FLAG_ARGON2_SSSE3 = 32,
   RANDOMX_FLAG_ARGON2_AVX2 = 64,
-  RANDOMX_FLAG_ARGON2 = 96
+  RANDOMX_FLAG_ARGON2 = 96,
+  RANDOMX_FLAG_MICRO = 128
 } randomx_flags;
 
 typedef struct randomx_dataset randomx_dataset;
@@ -200,6 +201,8 @@ RANDOMX_EXPORT void randomx_release_dataset(randomx_dataset *dataset);
  *         (4) dataset parameter is NULL and RANDOMX_FLAG_FULL_MEM is set
 */
 RANDOMX_EXPORT randomx_vm *randomx_create_vm(randomx_flags flags, randomx_cache *cache, randomx_dataset *dataset);
+
+RANDOMX_EXPORT randomx_vm *randomx_create_micro_vm(randomx_flags flags, randomx_cache *cache, randomx_dataset *dataset);
 
 /**
  * Reinitializes a virtual machine with a new Cache. This function should be called anytime
