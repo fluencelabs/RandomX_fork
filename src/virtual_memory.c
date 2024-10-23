@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 #include <sys/types.h>
 #include <sys/mman.h>
-#include <errno.h>
+// #include <errno.h>
 #ifndef MAP_ANONYMOUS
 #define MAP_ANONYMOUS MAP_ANON
 #endif
@@ -123,7 +123,7 @@ out:
 	return error;
 }
 #else
-#define Fail(func)	do  {*errfunc = func; return errno;} while(0)
+// #define Fail(func)	do  {*errfunc = func; return errno;} while(0)
 #endif
 
 void* allocMemoryPages(size_t bytes) {
@@ -156,52 +156,52 @@ void* allocMemoryPages(size_t bytes) {
 	return mem;
 }
 
-static inline int pageProtect(void* ptr, size_t bytes, int rules, char **errfunc) {
-#if defined(_WIN32) || defined(__CYGWIN__)
-	DWORD oldp;
-	if (!VirtualProtect(ptr, bytes, (DWORD)rules, &oldp)) {
-		Fail("VirtualProtect");
-	}
-#else
-	if (-1 == mprotect(ptr, bytes, rules))
-		Fail("mprotect");
-#endif
-	return 0;
-}
+// static inline int pageProtect(void* ptr, size_t bytes, int rules, char **errfunc) {
+// #if defined(_WIN32) || defined(__CYGWIN__)
+// 	DWORD oldp;
+// 	if (!VirtualProtect(ptr, bytes, (DWORD)rules, &oldp)) {
+// 		Fail("VirtualProtect");
+// 	}
+// #else
+// 	if (-1 == mprotect(ptr, bytes, rules))
+// 		Fail("mprotect");
+// #endif
+// 	return 0;
+// }
 
-void setPagesRW(void* ptr, size_t bytes) {
-	char *errfunc;
-#if defined(USE_PTHREAD_JIT_WP) && defined(MAC_OS_VERSION_11_0) \
-	&& MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_VERSION_11_0
-	if (__builtin_available(macOS 11.0, *)) {
-		pthread_jit_write_protect_np(0);
-	} else {
-		pageProtect(ptr, bytes, PAGE_READWRITE, &errfunc);
-	}
-#else
-	pageProtect(ptr, bytes, PAGE_READWRITE, &errfunc);
-#endif
-}
+// void setPagesRW(void* ptr, size_t bytes) {
+// 	char *errfunc;
+// #if defined(USE_PTHREAD_JIT_WP) && defined(MAC_OS_VERSION_11_0) \
+// 	&& MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_VERSION_11_0
+// 	if (__builtin_available(macOS 11.0, *)) {
+// 		pthread_jit_write_protect_np(0);
+// 	} else {
+// 		pageProtect(ptr, bytes, PAGE_READWRITE, &errfunc);
+// 	}
+// #else
+// 	pageProtect(ptr, bytes, PAGE_READWRITE, &errfunc);
+// #endif
+// }
 
-void setPagesRX(void* ptr, size_t bytes) {
-	char *errfunc;
-#if defined(USE_PTHREAD_JIT_WP) && defined(MAC_OS_VERSION_11_0) \
-	&& MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_VERSION_11_0
-	if (__builtin_available(macOS 11.0, *)) {
-		pthread_jit_write_protect_np(1);
-		__builtin___clear_cache((char*)ptr, ((char*)ptr) + bytes);
-	} else {
-		pageProtect(ptr, bytes, PAGE_EXECUTE_READ, &errfunc);
-	}
-#else
-	pageProtect(ptr, bytes, PAGE_EXECUTE_READ, &errfunc);
-#endif
-}
+// void setPagesRX(void* ptr, size_t bytes) {
+// 	char *errfunc;
+// #if defined(USE_PTHREAD_JIT_WP) && defined(MAC_OS_VERSION_11_0) \
+// 	&& MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_VERSION_11_0
+// 	if (__builtin_available(macOS 11.0, *)) {
+// 		pthread_jit_write_protect_np(1);
+// 		__builtin___clear_cache((char*)ptr, ((char*)ptr) + bytes);
+// 	} else {
+// 		pageProtect(ptr, bytes, PAGE_EXECUTE_READ, &errfunc);
+// 	}
+// #else
+// 	pageProtect(ptr, bytes, PAGE_EXECUTE_READ, &errfunc);
+// #endif
+// }
 
-void setPagesRWX(void* ptr, size_t bytes) {
-	char *errfunc;
-	pageProtect(ptr, bytes, PAGE_EXECUTE_READWRITE, &errfunc);
-}
+// void setPagesRWX(void* ptr, size_t bytes) {
+// 	char *errfunc;
+// 	pageProtect(ptr, bytes, PAGE_EXECUTE_READWRITE, &errfunc);
+// }
 
 void* allocLargePagesMemory(size_t bytes) {
 	void* mem;

@@ -29,9 +29,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma once
 
 #include <cstdint>
+#include "vector_freestanding.hpp"
 #include "superscalar_program.hpp"
 #include "blake2_generator.hpp"
-#include "vector_freestanding.hpp"
 
 namespace randomx {
 	                                              //                  Intel Ivy Bridge reference

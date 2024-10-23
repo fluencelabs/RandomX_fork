@@ -521,7 +521,8 @@ FORCE_INLINE rx_vec_f128 rx_cvt_packed_int_vec_f128(const void* addr) {
 
 #include <cstdint>
 #include <cstdlib>
-#include <cmath>
+#include <math.h>
+#include <malloc.h>
 
 typedef union {
 	uint64_t u64[2];
@@ -719,14 +720,15 @@ FORCE_INLINE rx_vec_f128 rx_cvt_packed_int_vec_f128(const void* addr) {
 #ifndef HAVE_AES
 static const char* platformError = "Platform doesn't support hardware AES";
 
-#include <stdexcept>
+#include <cstdlib>
+extern "C" void abort(void) __attribute__ ((__noreturn__));
 
 FORCE_INLINE rx_vec_i128 rx_aesenc_vec_i128(rx_vec_i128 v, rx_vec_i128 rkey) {
-	throw std::runtime_error(platformError);
+    abort();
 }
 
 FORCE_INLINE rx_vec_i128 rx_aesdec_vec_i128(rx_vec_i128 v, rx_vec_i128 rkey) {
-	throw std::runtime_error(platformError);
+    abort();
 }
 
 #define HAVE_AES 0

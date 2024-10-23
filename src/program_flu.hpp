@@ -28,19 +28,33 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #pragma once
 
-#include <stdint.h>
-#include "intrin_portable_flu.h"
+#include <cstdint>
+#include "common.hpp"
+#include "instruction.hpp"
+#include "blake2/endian.h"
 
-rx_vec_i128 soft_aesenc(rx_vec_i128 in, rx_vec_i128 key);
+namespace randomx {
 
-rx_vec_i128 soft_aesdec(rx_vec_i128 in, rx_vec_i128 key);
+	struct ProgramConfiguration {
+		uint64_t eMask[2];
+		uint32_t readReg0, readReg1, readReg2, readReg3;
+	};
 
-template<bool soft>
-inline rx_vec_i128 aesenc(rx_vec_i128 in, rx_vec_i128 key) {
-	return soft ? soft_aesenc(in, key) : rx_aesenc_vec_i128(in, key);
-}
+	class Program {
+	public:
+		Instruction& operator()(int pc) {
+			return programBuffer[pc];
+		}
+		uint64_t getEntropy(int i) {
+			return load64(&entropyBuffer[i]);
+		}
+		uint32_t getSize() {
+			return RANDOMX_PROGRAM_SIZE;
+		}
+	private:
+		uint64_t entropyBuffer[16];
+		Instruction programBuffer[RANDOMX_PROGRAM_SIZE];
+	};
 
-template<bool soft>
-inline rx_vec_i128 aesdec(rx_vec_i128 in, rx_vec_i128 key) {
-	return soft ? soft_aesdec(in, key) : rx_aesdec_vec_i128(in, key);
+	static_assert(sizeof(Program) % 64 == 0, "Invalid size of class randomx::Program");
 }

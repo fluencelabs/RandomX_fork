@@ -29,9 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma once
 
 #include <cstdint>
-#include <iostream>
 #include <climits>
-#include "blake2/endian.h"
 #include "configuration.h"
 #include "randomx.h"
 
@@ -117,8 +115,8 @@ namespace randomx {
 #if defined(_M_X64) || defined(__x86_64__)
 	#define RANDOMX_HAVE_COMPILER 1
 	#define RANDOMX_COMPILER_X86
-	class JitCompilerX86;
-	using JitCompiler = JitCompilerX86;
+	// class JitCompilerX86;
+	// using JitCompiler = JitCompilerX86;
 #elif defined(__aarch64__)
 	#define RANDOMX_HAVE_COMPILER 1
 	#define RANDOMX_COMPILER_A64

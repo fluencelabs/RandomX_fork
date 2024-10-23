@@ -26,21 +26,51 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#pragma once
-
-#include <stdint.h>
+// #include <new>
+#include "allocator_flu.hpp"
 #include "intrin_portable_flu.h"
+// #include "virtual_memory.h"
+#include "common.hpp"
+#include <malloc.h>
 
-rx_vec_i128 soft_aesenc(rx_vec_i128 in, rx_vec_i128 key);
+namespace randomx {
 
-rx_vec_i128 soft_aesdec(rx_vec_i128 in, rx_vec_i128 key);
+	template<size_t alignment>
+	void* AlignedAllocator<alignment>::allocMemory(size_t count) {
+		void *mem = rx_aligned_alloc(count, alignment);
+		if (mem == nullptr) {
+			abort();
+			// throw std::bad_alloc();
+		}
+		return mem;
+	}
 
-template<bool soft>
-inline rx_vec_i128 aesenc(rx_vec_i128 in, rx_vec_i128 key) {
-	return soft ? soft_aesenc(in, key) : rx_aesenc_vec_i128(in, key);
-}
+	template<size_t alignment>
+	void AlignedAllocator<alignment>::freeMemory(void* ptr, size_t count) {
+		rx_aligned_free(ptr);
+	}
 
-template<bool soft>
-inline rx_vec_i128 aesdec(rx_vec_i128 in, rx_vec_i128 key) {
-	return soft ? soft_aesdec(in, key) : rx_aesdec_vec_i128(in, key);
+	template struct AlignedAllocator<CacheLineSize>;
+
+	// void* LargePageAllocator::allocMemory(size_t count) {
+	// 	void *mem = allocLargePagesMemory(count);
+	// 	if (mem == nullptr) {
+	// 		abort();
+	// 		// throw std::bad_alloc();
+	// 	}
+	// 	return mem;
+	// }
+
+	// void LargePageAllocator::freeMemory(void* ptr, size_t count) {
+	// 	freePagedMemory(ptr, count);
+	// };
+
+
+	void* DummyAllocator::allocMemory(size_t count) {
+		return nullptr;
+	}
+
+	void DummyAllocator::freeMemory(void* ptr, size_t count) {
+		
+	};
 }

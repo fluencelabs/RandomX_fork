@@ -30,7 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cstdint>
 #include "common.hpp"
-#include "program.hpp"
+#include "program_flu.hpp"
 #include "string_freestanding.hpp"
 
 /* Global namespace for C binding */

@@ -52,7 +52,7 @@ uint64_t randomx_reciprocal(uint32_t divisor) {
 	const uint64_t q = p2exp63 / divisor;
 	const uint64_t r = p2exp63 % divisor;
 
-#ifdef __GNUC__
+#if defined (__GNUC__) && defined (__GLIBC__)
 	const uint32_t shift = 64 - __builtin_clzll(divisor);
 #else
 	uint32_t shift = 32;

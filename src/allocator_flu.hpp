@@ -28,19 +28,23 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #pragma once
 
-#include <stdint.h>
-#include "intrin_portable_flu.h"
+#include <cstddef>
 
-rx_vec_i128 soft_aesenc(rx_vec_i128 in, rx_vec_i128 key);
+namespace randomx {
 
-rx_vec_i128 soft_aesdec(rx_vec_i128 in, rx_vec_i128 key);
+	template<size_t alignment>
+	struct AlignedAllocator {
+		static void* allocMemory(size_t);
+		static void freeMemory(void*, size_t);
+	};
 
-template<bool soft>
-inline rx_vec_i128 aesenc(rx_vec_i128 in, rx_vec_i128 key) {
-	return soft ? soft_aesenc(in, key) : rx_aesenc_vec_i128(in, key);
-}
+	// struct LargePageAllocator {
+	// 	static void* allocMemory(size_t);
+	// 	static void freeMemory(void*, size_t);
+	// };
 
-template<bool soft>
-inline rx_vec_i128 aesdec(rx_vec_i128 in, rx_vec_i128 key) {
-	return soft ? soft_aesdec(in, key) : rx_aesdec_vec_i128(in, key);
+    struct DummyAllocator {
+		static void* allocMemory(size_t);
+		static void freeMemory(void*, size_t);
+	};
 }

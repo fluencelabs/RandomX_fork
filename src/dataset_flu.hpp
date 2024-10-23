@@ -29,12 +29,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma once
 
 #include <cstdint>
-#include <malloc.h>
 #include <type_traits>
 #include "vector_freestanding.hpp"
 #include "common.hpp"
 #include "string_freestanding.hpp"
 #include "superscalar_program.hpp"
+#include "intrin_portable_flu.h"
 #include "allocator.hpp"
 #include "argon2.h"
 
@@ -50,7 +50,6 @@ struct randomx_cache {
 	uint8_t* microCache = nullptr;
 
 	randomx::CacheDeallocFunc* dealloc;
-	// randomx::JitCompiler* jit;
 	randomx::CacheInitializeFunc* initialize;
 	randomx::DatasetInitFunc* datasetInit;
 	randomx::SuperscalarProgram programs[RANDOMX_CACHE_ACCESSES];
@@ -60,6 +59,18 @@ struct randomx_cache {
 
 	bool isInitialized() {
 		return programs[0].getSize() != 0;
+	}
+
+	void* operator new(size_t size) {
+		void* ptr = malloc(size);
+		if (ptr == nullptr) {
+			abort();
+		}
+		return ptr;
+	}
+	
+	void operator delete(void* ptr) {
+		free(ptr);
 	}
 };
 

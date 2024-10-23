@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <new>
 #include <cstdint>
 #include "virtual_machine.hpp"
-#include "jit_compiler.hpp"
+// #include "jit_compiler.hpp"
 #include "allocator.hpp"
 #include "dataset.hpp"
 
@@ -63,7 +63,7 @@ namespace randomx {
 	protected:
 		void execute();
 
-		JitCompiler compiler;
+		// JitCompiler compiler;
 	};
 
 	using CompiledVmDefault = CompiledVm<AlignedAllocator<CacheLineSize>, true, false>;

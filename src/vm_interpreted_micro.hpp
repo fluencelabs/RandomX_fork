@@ -28,8 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #pragma once
 
-#include <new>
-#include "vm_interpreted.hpp"
+#include "vm_interpreted_flu.hpp"
 
 namespace randomx {
 
@@ -40,8 +39,9 @@ namespace randomx {
 		using VmBase<Allocator, softAes>::cachePtr;
 		void* operator new(size_t size) {
 			void* ptr = AlignedAllocator<CacheLineSize>::allocMemory(size);
-			if (ptr == nullptr)
-				throw std::bad_alloc();
+			if (ptr == nullptr) {
+				abort();
+			}
 			return ptr;
 		}
 		void operator delete(void* ptr) {

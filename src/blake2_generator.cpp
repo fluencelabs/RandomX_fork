@@ -41,6 +41,8 @@ namespace randomx {
 		store32(&data[maxSeedSize], nonce);
 	}
 
+	Blake2Generator::~Blake2Generator() {};
+
 	uint8_t Blake2Generator::getByte() {
 		checkData(1);
 		return data[dataIndex++];

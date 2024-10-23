@@ -35,6 +35,7 @@ namespace randomx {
 	class Blake2Generator {
 	public:
 		Blake2Generator(const void* seed, size_t seedSize, int nonce = 0);
+		~Blake2Generator();
 		uint8_t getByte();
 		uint32_t getUInt32();
 	private:
