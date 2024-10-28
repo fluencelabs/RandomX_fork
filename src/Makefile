@@ -48,33 +48,24 @@ CFLAGS := -march=rv32im -mabi=ilp32 -Wl,--gc-sections $(OPTFLAGS) $(UBFLAGS) \
 
 CXXFLAGS := -std=c++11 -fno-rtti
 
-default: $(TARGET)
-all: default
+default: all
+# all: default
 
 RANDOMX_OBJS = $(patsubst %.c,%.randomx_c.o,$(patsubst %.cpp,%.randomx_cpp.o,$(RANDOMX_SRC)))
 TARGETS=$(RANDOMX_OBJS)
 
 .PHONY: default all clean
 
-all: $(TARGETS) randomx_combined.o librandomxflu.a librandomx_malloc_test_lib.a
+all: $(TARGETS) randomx_combined.o librandomxflu.a
 
 %.randomx_c.o: %.c
-	$(CC) $(CFLAGS) -c -o $@ $(<F)
+	$(CC) $(CFLAGS) -c -o $@ $(<)
 
 %.randomx_cpp.o: %.cpp
-	$(CXX) $(CXXFLAGS) $(CFLAGS) -c -o $@ $(<F)
-
-randomx_malloc_test.o: randomx_malloc_test.c
-	$(CC) $(CFLAGS) -c -o randomx_malloc_test.o randomx_malloc_test.c
-
-randomx_malloc_test_lib.o: randomx_malloc_test.o
-	$(LD) -relocatable randomx_malloc_test.o -o randomx_malloc_test_lib.o
-
-librandomx_malloc_test_lib.a: randomx_malloc_test_lib.o
-	ar rcs librandomx_malloc_test_lib.a randomx_malloc_test_lib.o
+	$(CXX) $(CXXFLAGS) $(CFLAGS) -c -o $@ $(<)
 
 randomx_combined.o: $(RANDOMX_OBJS)
-	$(LD) -relocatable $(RANDOMX_OBJS) -o randomx_combined.o #/tmp/libc_obj/libc_a-malloc.o #/opt/riscv32/riscv32-unknown-elf/lib/libc.a #/opt/riscv32/riscv32-unknown-elf/lib/libstdc++.a /opt/riscv32/riscv32-unknown-elf/lib/libc.a
+	$(LD) -relocatable $(RANDOMX_OBJS) -o randomx_combined.o
  
 librandomxflu.a: $(RANDOMX_OBJS)
 	ar rcs librandomxflu.a randomx_combined.o
