@@ -118,10 +118,9 @@ namespace randomx {
 		/* 3. Initialization: Hashing inputs, allocating memory, filling first
 		 * blocks
 		 */
-		randomx_argon2_initialize(&instance, &context);
+		// randomx_argon2_initialize(&instance, &context);
 
-		randomx_argon2_fill_memory_blocks(&instance);
-
+		// randomx_argon2_fill_memory_blocks(&instance);
 		cache->reciprocalCache.clear();
 		randomx::Blake2Generator gen(key, keySize);
 		for (int i = 0; i < RANDOMX_CACHE_ACCESSES; ++i) {
@@ -136,6 +135,80 @@ namespace randomx {
 			}
 		}
 	}
+
+
+	void initCache4MicroMode(randomx_cache* cache, const void* key, size_t keySize) {
+		uint32_t memory_blocks, segment_length;
+		argon2_instance_t instance;
+		argon2_context context;
+
+		context.out = nullptr;
+		context.outlen = 0;
+		context.pwd = CONST_CAST(uint8_t *)key;
+		context.pwdlen = (uint32_t)keySize;
+		context.salt = CONST_CAST(uint8_t *)RANDOMX_ARGON_SALT;
+		context.saltlen = (uint32_t)randomx::ArgonSaltSize;
+		context.secret = NULL;
+		context.secretlen = 0;
+		context.ad = NULL;
+		context.adlen = 0;
+		context.t_cost = RANDOMX_ARGON_ITERATIONS;
+		context.m_cost = RANDOMX_ARGON_MEMORY;
+		context.lanes = RANDOMX_ARGON_LANES;
+		context.threads = 1;
+		context.allocate_cbk = NULL;
+		context.free_cbk = NULL;
+		context.flags = ARGON2_DEFAULT_FLAGS;
+		context.version = ARGON2_VERSION_NUMBER;
+
+		int inputsValid = randomx_argon2_validate_inputs(&context);
+		assert(inputsValid == ARGON2_OK);
+
+		/* 2. Align memory size */
+		/* Minimum memory_blocks = 8L blocks, where L is the number of lanes */
+		memory_blocks = context.m_cost;
+
+		segment_length = memory_blocks / (context.lanes * ARGON2_SYNC_POINTS);
+
+		instance.version = context.version;
+		instance.memory = NULL;
+		instance.passes = context.t_cost;
+		instance.memory_blocks = memory_blocks;
+		instance.segment_length = segment_length;
+		instance.lane_length = segment_length * ARGON2_SYNC_POINTS;
+		instance.lanes = context.lanes;
+		instance.threads = context.threads;
+		instance.type = Argon2_d;
+		instance.memory = (block*)cache->memory;
+		instance.impl = cache->argonImpl;
+
+		if (instance.threads > instance.lanes) {
+			instance.threads = instance.lanes;
+		}
+
+		/* 3. Initialization: Hashing inputs, allocating memory, filling first
+		 * blocks
+		 */
+		// randomx_argon2_initialize(&instance, &context);
+
+		// randomx_argon2_fill_memory_blocks(&instance);
+
+		cache->reciprocalCache.clear();
+		// cache->programs[0].size = 256;
+		randomx::Blake2Generator gen(key, keySize);
+		for (int i = 0; i < RANDOMX_CACHE_ACCESSES; ++i) {
+			randomx::generateSuperscalar(cache->programs[i], gen);
+			for (unsigned j = 0; j < cache->programs[i].getSize(); ++j) {
+				auto& instr = cache->programs[i](j);
+				if ((SuperscalarInstructionType)instr.opcode == SuperscalarInstructionType::IMUL_RCP) {
+					auto rcp = randomx_reciprocal(instr.getImm32());
+					instr.setImm32(cache->reciprocalCache.size());
+					cache->reciprocalCache.push_back(rcp);
+				}
+			}
+		}
+	}
+
 
 	constexpr uint64_t superscalarMul0 = 6364136223846793005ULL;
 	constexpr uint64_t superscalarAdd1 = 9298411001130361340ULL;
@@ -182,5 +255,8 @@ namespace randomx {
 	void initDataset(randomx_cache* cache, uint8_t* dataset, uint32_t startItem, uint32_t endItem) {
 		for (uint32_t itemNumber = startItem; itemNumber < endItem; ++itemNumber, dataset += CacheLineSize)
 			initDatasetItem(cache, dataset, itemNumber);
+	}
+
+		void initDataset4MicroMode(randomx_cache* cache, uint8_t* dataset, uint32_t startItem, uint32_t endItem) {
 	}
 }

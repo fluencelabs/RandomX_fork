@@ -50,6 +50,6 @@ namespace randomx {
 
 	template class InterpretedMicroVm<AlignedAllocator<CacheLineSize>, false>;
 	template class InterpretedMicroVm<AlignedAllocator<CacheLineSize>, true>;
-	template class InterpretedMicroVm<LargePageAllocator, false>;
-	template class InterpretedMicroVm<LargePageAllocator, true>;
+	// template class InterpretedMicroVm<LargePageAllocator, false>;
+	// template class InterpretedMicroVm<LargePageAllocator, true>;
 }

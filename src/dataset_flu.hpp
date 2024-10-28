@@ -102,9 +102,11 @@ namespace randomx {
 	void deallocCache(randomx_cache* cache);
 
 	void initCache(randomx_cache*, const void*, size_t);
+	void initCache4MicroMode(randomx_cache* cache, const void* key, size_t keySize);
 	void initCacheCompile(randomx_cache*, const void*, size_t);
 	void initDatasetItem(randomx_cache* cache, uint8_t* out, uint64_t blockNumber);
 	void initDataset(randomx_cache* cache, uint8_t* dataset, uint32_t startBlock, uint32_t endBlock);
+	void initDataset4MicroMode(randomx_cache* cache, uint8_t* dataset, uint32_t startBlock, uint32_t endBlock);
 
 	inline randomx_argon2_impl* selectArgonImpl(randomx_flags flags) {
 		// if (flags & RANDOMX_FLAG_ARGON2_AVX2) {

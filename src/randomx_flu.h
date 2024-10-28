@@ -215,6 +215,8 @@ RANDOMX_EXPORT randomx_vm *randomx_create_micro_vm(randomx_flags flags, randomx_
 */
 RANDOMX_EXPORT void randomx_vm_set_cache(randomx_vm *machine, randomx_cache* cache);
 
+RANDOMX_EXPORT randomx_cache *randomx_cache_set_micro_cache(randomx_cache* cache, void* microCache, size_t microCacheSize);
+
 /**
  * Reinitializes a virtual machine with a new Dataset.
  *

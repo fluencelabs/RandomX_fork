@@ -125,6 +125,6 @@ namespace randomx {
 
 	template class InterpretedVm<AlignedAllocator<CacheLineSize>, false>;
 	template class InterpretedVm<AlignedAllocator<CacheLineSize>, true>;
-	template class InterpretedVm<LargePageAllocator, false>;
-	template class InterpretedVm<LargePageAllocator, true>;
+	// template class InterpretedVm<LargePageAllocator, false>;
+	// template class InterpretedVm<LargePageAllocator, true>;
 }

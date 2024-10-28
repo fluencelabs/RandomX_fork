@@ -212,54 +212,94 @@ endif()
 
 set(RANDOMX_INCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/src" CACHE STRING "RandomX Include path")
 
-add_library(randomx ${randomx_sources})
+# add_library(randomx ${randomx_sources})
 
-if(TARGET generate-asm)
-  add_dependencies(randomx generate-asm)
-endif()
+# if(TARGET generate-asm)
+#   add_dependencies(randomx generate-asm)
+# endif()
 
-set_property(TARGET randomx PROPERTY POSITION_INDEPENDENT_CODE ON)
-set_property(TARGET randomx PROPERTY CXX_STANDARD 11)
-set_property(TARGET randomx PROPERTY CXX_STANDARD_REQUIRED ON)
-set_property(TARGET randomx PROPERTY PUBLIC_HEADER src/randomx.h)
+# set_property(TARGET randomx PROPERTY POSITION_INDEPENDENT_CODE ON)
+# set_property(TARGET randomx PROPERTY CXX_STANDARD 11)
+# set_property(TARGET randomx PROPERTY CXX_STANDARD_REQUIRED ON)
+# set_property(TARGET randomx PROPERTY PUBLIC_HEADER src/randomx.h)
+
+# include(GNUInstallDirs)
+# install(TARGETS randomx
+#   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+#   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+#   PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
+# add_executable(randomx-tests
+#   src/tests/tests.cpp)
+# target_link_libraries(randomx-tests
+#   PRIVATE randomx)
+# set_property(TARGET randomx-tests PROPERTY POSITION_INDEPENDENT_CODE ON)
+# set_property(TARGET randomx-tests PROPERTY CXX_STANDARD 11)
+
+# add_executable(randomx-codegen
+#   src/tests/code-generator.cpp)
+# target_link_libraries(randomx-codegen
+#   PRIVATE randomx)
+
+# set_property(TARGET randomx-codegen PROPERTY POSITION_INDEPENDENT_CODE ON)
+# set_property(TARGET randomx-codegen PROPERTY CXX_STANDARD 11)
+
+# if(NOT Threads_FOUND AND UNIX AND NOT APPLE)
+#   set(THREADS_PREFER_PTHREAD_FLAG ON)
+#   find_package(Threads)
+# endif()
+
+# add_executable(randomx-benchmark
+#   src/tests/benchmark.cpp
+#   src/tests/affinity.cpp)
+# target_link_libraries(randomx-benchmark
+#   PRIVATE randomx
+#   PRIVATE ${CMAKE_THREAD_LIBS_INIT})
+
+
+set(randomx_sources_flu
+  src/vector_freestanding.cpp
+	src/randomx_flu.cpp
+	src/string_freestanding.cpp
+	src/vm_interpreted_micro.cpp
+	src/vm_interpreted_flu.cpp
+	src/virtual_machine_flu.cpp
+	src/superscalar_flu.cpp
+	src/dataset_flu.cpp
+	src/stubs.cpp
+	src/argon2_core.c
+	src/aes_hash.cpp
+	src/soft_aes.cpp
+	src/reciprocal.c
+	src/allocator_flu.cpp
+	src/instructions_portable_flu.cpp
+	src/bytecode_machine_flu.cpp
+	src/argon2_ref.c
+	src/blake2/blake2b.c
+	src/blake2_generator.cpp)
+
+add_library(randomxflu ${randomx_sources_flu})
+
+# if(TARGET generate-asm)
+#   add_dependencies(randomx generate-asm)
+# endif()
+
+set_property(TARGET randomxflu PROPERTY POSITION_INDEPENDENT_CODE ON)
+set_property(TARGET randomxflu PROPERTY CXX_STANDARD 11)
+set_property(TARGET randomxflu PROPERTY CXX_STANDARD_REQUIRED ON)
+set_property(TARGET randomxflu PROPERTY PUBLIC_HEADER src/randomx.h)
 
 include(GNUInstallDirs)
-install(TARGETS randomx
+install(TARGETS randomxflu
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
   PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
-add_executable(randomx-tests
-  src/tests/tests.cpp)
-target_link_libraries(randomx-tests
-  PRIVATE randomx)
-set_property(TARGET randomx-tests PROPERTY POSITION_INDEPENDENT_CODE ON)
-set_property(TARGET randomx-tests PROPERTY CXX_STANDARD 11)
-
-add_executable(randomx-codegen
-  src/tests/code-generator.cpp)
-target_link_libraries(randomx-codegen
-  PRIVATE randomx)
-
-set_property(TARGET randomx-codegen PROPERTY POSITION_INDEPENDENT_CODE ON)
-set_property(TARGET randomx-codegen PROPERTY CXX_STANDARD 11)
-
-if(NOT Threads_FOUND AND UNIX AND NOT APPLE)
-  set(THREADS_PREFER_PTHREAD_FLAG ON)
-  find_package(Threads)
-endif()
-
-add_executable(randomx-benchmark
-  src/tests/benchmark.cpp
-  src/tests/affinity.cpp)
-target_link_libraries(randomx-benchmark
-  PRIVATE randomx
-  PRIVATE ${CMAKE_THREAD_LIBS_INIT})
 
 add_executable(randomx-micro-mode-runner
   src/tests/micro-mode-runner.cpp)
 target_link_libraries(randomx-micro-mode-runner
-  PRIVATE randomx)
+  PRIVATE randomxflu)
 
 include(CheckCXXSourceCompiles)
 check_cxx_source_compiles("
@@ -270,9 +310,9 @@ int main() {
   a.is_lock_free();
 }" HAVE_CXX_ATOMICS)
 
-if(NOT HAVE_CXX_ATOMICS)
-  target_link_libraries(randomx-benchmark
-    PRIVATE "atomic")
-endif()
-set_property(TARGET randomx-benchmark PROPERTY POSITION_INDEPENDENT_CODE ON)
-set_property(TARGET randomx-benchmark PROPERTY CXX_STANDARD 11)
+# if(NOT HAVE_CXX_ATOMICS)
+#   target_link_libraries(randomx-benchmark
+#     PRIVATE "atomic")
+# endif()
+# set_property(TARGET randomx-benchmark PROPERTY POSITION_INDEPENDENT_CODE ON)
+# set_property(TARGET randomx-benchmark PROPERTY CXX_STANDARD 11)

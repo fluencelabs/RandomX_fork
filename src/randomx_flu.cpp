@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "blake2/blake2.h"
 #include "cpu.hpp"
 #include <cassert>
+#include <cstdint>
 #include <limits>
 
 #if defined(__SSE__) || defined(__SSE2__) || (defined(_M_IX86_FP) && (_M_IX86_FP > 0))
@@ -74,13 +75,13 @@ extern "C" {
 		{
 			cache = new randomx_cache();
 			cache->argonImpl = impl;
-			switch ((int)(flags & (RANDOMX_FLAG_JIT | RANDOMX_FLAG_LARGE_PAGES))) {
-				case RANDOMX_FLAG_DEFAULT:
-					cache->dealloc = &randomx::deallocCache<randomx::DefaultAllocator>;
-					cache->initialize = &randomx::initCache;
-					cache->datasetInit = &randomx::initDataset;
-					cache->memory = (uint8_t*)randomx::DefaultAllocator::allocMemory(randomx::CacheSize);
-					break;
+			switch ((int)(flags & (RANDOMX_FLAG_JIT | RANDOMX_FLAG_LARGE_PAGES | RANDOMX_FLAG_MICRO))) {
+				// case RANDOMX_FLAG_DEFAULT:
+				// 	cache->dealloc = &randomx::deallocCache<randomx::DefaultAllocator>;
+				// 	cache->initialize = &randomx::initCache;
+				// 	cache->datasetInit = &randomx::initDataset;
+				// 	cache->memory = (uint8_t*)randomx::DefaultAllocator::allocMemory(randomx::CacheSize);
+				// 	break;
 
 				// case RANDOMX_FLAG_JIT:
 				// 	cache->dealloc = &randomx::deallocCache<randomx::DefaultAllocator>;
@@ -106,13 +107,12 @@ extern "C" {
 				// 	cache->memory = (uint8_t*)randomx::LargePageAllocator::allocMemory(randomx::CacheSize);
 				// 	break;
 
-                // case RANDOMX_FLAG_MICRO:
-				// 	cache->dealloc = &randomx::deallocCache<randomx::DummyAllocator>;
-				// 	cache->jit = nullptr;
-				// 	cache->initialize = nullptr;
-				// 	cache->datasetInit = nullptr;
-				// 	cache->memory = nullptr;
-				// 	break;
+                case RANDOMX_FLAG_MICRO:
+					cache->dealloc = &randomx::deallocCache<randomx::DefaultAllocator>;
+					cache->initialize = &randomx::initCache4MicroMode;
+					cache->datasetInit = &randomx::initDataset4MicroMode;
+					cache->memory = (uint8_t*)randomx::DefaultAllocator::allocMemory(randomx::CacheSize);
+					break;
 				default:
 					UNREACHABLE;
 			}
@@ -343,14 +343,19 @@ extern "C" {
 	// 	return vm;
 	// }
 
+	randomx_cache *randomx_cache_set_micro_cache(randomx_cache* cache, void* microCache, size_t microCacheSize) {
+		cache->microCache = reinterpret_cast<uint8_t*>(microCache);
+		return cache;
+	}
+
 	randomx_vm *randomx_create_micro_vm(randomx_flags flags, randomx_cache *cache, randomx_dataset *dataset) {
 		assert(cache != nullptr || (flags & RANDOMX_FLAG_FULL_MEM));
-		assert(cache == nullptr || cache->isInitialized());
+		// assert(cache == nullptr || cache->isInitialized());
 		assert(dataset != nullptr || !(flags & RANDOMX_FLAG_FULL_MEM));
 
 		randomx_vm *vm = nullptr;
 
-		// try {
+		// // // try {
 			switch ((int)(flags & RANDOMX_FLAG_MICRO)) {
 				case RANDOMX_FLAG_MICRO:
 					vm = new randomx::InterpretedMicroVmDefault();
@@ -369,11 +374,11 @@ extern "C" {
 				vm->setDataset(dataset);
 
 			vm->allocate();
-		// }
-		// catch (std::exception &ex) {
-		// 	delete vm;
-		// 	vm = nullptr;
-		// }
+		// // }
+		// // catch (std::exception &ex) {
+		// // 	delete vm;
+		// // 	vm = nullptr;
+		// // }
 
 		return vm;
 	}

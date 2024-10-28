@@ -11,7 +11,7 @@
     
 	namespace randomx 
 	{
-//Macro-operation as output of the x86 decoder
+	//Macro-operation as output of the x86 decoder
 	//Usually one macro-op max= one x86 instruction, but 2 instructions are sometimes fused into 1 macro-op
 	//Macro-op can consist of 1 or 2 uOPs.
 	class MacroOp {
