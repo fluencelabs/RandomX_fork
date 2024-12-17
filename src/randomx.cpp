@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vm_compiled.hpp"
 #include "vm_compiled_light.hpp"
 #include "blake2/blake2.h"
+#include "aes_hash.hpp"
 #include "cpu.hpp"
 #include <cassert>
 #include <limits>
@@ -375,11 +376,11 @@ extern "C" {
 		assert(blakeResult == 0);
 		machine->initScratchpad(&tempHash);
 		machine->resetRoundingMode();
-		for (int chain = 0; chain < RANDOMX_PROGRAM_COUNT - 1; ++chain) {
-			machine->run(&tempHash);
-			blakeResult = blake2b(tempHash, sizeof(tempHash), machine->getRegisterFile(), sizeof(randomx::RegisterFile), nullptr, 0);
-			assert(blakeResult == 0);
-		}
+		// for (int chain = 0; chain < RANDOMX_PROGRAM_COUNT - 1; ++chain) {
+		// 	machine->run(&tempHash);
+		// 	blakeResult = blake2b(tempHash, sizeof(tempHash), machine->getRegisterFile(), sizeof(randomx::RegisterFile), nullptr, 0);
+		// 	assert(blakeResult == 0);
+		// }
 		machine->run(&tempHash);
 		machine->getFinalResult(output, RANDOMX_HASH_SIZE);
 
@@ -428,4 +429,18 @@ extern "C" {
 		blake2b_update(&state, hash_in, RANDOMX_HASH_SIZE);
 		blake2b_final(&state, com_out, RANDOMX_HASH_SIZE);
 	}
+
+	void randomx_fill_aes_1rx4(void *state, size_t outputSize, void *buffer) {
+		fillAes1Rx4<false>(state, outputSize, buffer);
+	}
+
+	void randomx_fill_aes_4rx4(void *state, size_t outputSize, void *buffer) {
+		fillAes4Rx4<false>(state, outputSize, buffer);
+	}
+
+	void randomx_reset_rounding_mode() {
+		rx_reset_float_state();
+	}
+
+	
 }

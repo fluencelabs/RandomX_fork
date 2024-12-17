@@ -271,6 +271,15 @@ RANDOMX_EXPORT void randomx_calculate_hash_last(randomx_vm* machine, void* outpu
 */
 RANDOMX_EXPORT void randomx_calculate_commitment(const void* input, size_t inputSize, const void* hash_in, void* com_out);
 
+RANDOMX_EXPORT int randomx_blake2b(void *out, size_t outlen, const void *in, size_t inlen,
+		const void *key, size_t keylen);
+
+
+RANDOMX_EXPORT void randomx_fill_aes_1rx4(void *state, size_t outputSize, void *buffer);
+RANDOMX_EXPORT void randomx_fill_aes_4rx4(void *state, size_t outputSize, void *buffer);
+
+RANDOMX_EXPORT void randomx_reset_rounding_mode();
+
 #if defined(__cplusplus)
 }
 #endif
