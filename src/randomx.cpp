@@ -438,9 +438,19 @@ extern "C" {
 		fillAes4Rx4<false>(state, outputSize, buffer);
 	}
 
+	void randomx_hash_aes_1rx4(void *input, size_t inputSize, void *hash) {
+		return hashAes1Rx4<false>(input, inputSize, hash);
+	}
+
 	void randomx_reset_rounding_mode() {
 		rx_reset_float_state();
 	}
+
+	void randomx_init_dataset_item(randomx_cache* cache, void* out, uint64_t itemNumber) {
+		auto outPtr = static_cast<uint8_t*>(out); 
+		randomx::initDatasetItem(cache, outPtr, itemNumber);
+	}
+
 
 	
 }

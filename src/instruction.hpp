@@ -72,6 +72,42 @@ namespace randomx {
 		NOP = 29,
 	};
 
+	inline std::ostream& operator<<(std::ostream& os, InstructionType type) {
+    switch (type) {
+        case InstructionType::IADD_RS:   return os << "IADD_RS";
+        case InstructionType::IADD_M:    return os << "IADD_M";
+        case InstructionType::ISUB_R:    return os << "ISUB_R";
+        case InstructionType::ISUB_M:    return os << "ISUB_M";
+        case InstructionType::IMUL_R:    return os << "IMUL_R";
+        case InstructionType::IMUL_M:    return os << "IMUL_M";
+        case InstructionType::IMULH_R:   return os << "IMULH_R";
+        case InstructionType::IMULH_M:   return os << "IMULH_M";
+        case InstructionType::ISMULH_R:  return os << "ISMULH_R";
+        case InstructionType::ISMULH_M:  return os << "ISMULH_M";
+        case InstructionType::IMUL_RCP:  return os << "IMUL_RCP";
+        case InstructionType::INEG_R:    return os << "INEG_R";
+        case InstructionType::IXOR_R:    return os << "IXOR_R";
+        case InstructionType::IXOR_M:    return os << "IXOR_M";
+        case InstructionType::IROR_R:    return os << "IROR_R";
+        case InstructionType::IROL_R:    return os << "IROL_R";
+        case InstructionType::ISWAP_R:   return os << "ISWAP_R";
+        case InstructionType::FSWAP_R:   return os << "FSWAP_R";
+        case InstructionType::FADD_R:    return os << "FADD_R";
+        case InstructionType::FADD_M:    return os << "FADD_M";
+        case InstructionType::FSUB_R:    return os << "FSUB_R";
+        case InstructionType::FSUB_M:    return os << "FSUB_M";
+        case InstructionType::FSCAL_R:   return os << "FSCAL_R";
+        case InstructionType::FMUL_R:    return os << "FMUL_R";
+        case InstructionType::FDIV_M:    return os << "FDIV_M";
+        case InstructionType::FSQRT_R:   return os << "FSQRT_R";
+        case InstructionType::CBRANCH:   return os << "CBRANCH";
+        case InstructionType::CFROUND:   return os << "CFROUND";
+        case InstructionType::ISTORE:    return os << "ISTORE";
+        case InstructionType::NOP:       return os << "NOP";
+    }
+    return os << "Unknown InstructionType(" << static_cast<uint16_t>(type) << ")";
+}
+
 	class Instruction {
 	public:
 		uint32_t getImm32() const {

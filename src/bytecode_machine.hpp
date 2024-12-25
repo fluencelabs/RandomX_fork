@@ -32,8 +32,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "intrin_portable.h"
 #include "instruction.hpp"
 #include "program.hpp"
+#include <iomanip>
 
 namespace randomx {
+
+	std::ostream& operator<<(std::ostream& os, const __m128d& value);
 
 	//register file in machine byte order
 	struct NativeRegisterFile {
@@ -65,41 +68,44 @@ namespace randomx {
 	};
 
 #define OPCODE_CEIL_DECLARE(curr, prev) constexpr int ceil_ ## curr = ceil_ ## prev + RANDOMX_FREQ_ ## curr;
-	constexpr int ceil_NULL = 0;
-	OPCODE_CEIL_DECLARE(IADD_RS, NULL);
-	OPCODE_CEIL_DECLARE(IADD_M, IADD_RS);
-	OPCODE_CEIL_DECLARE(ISUB_R, IADD_M);
-	OPCODE_CEIL_DECLARE(ISUB_M, ISUB_R);
-	OPCODE_CEIL_DECLARE(IMUL_R, ISUB_M);
-	OPCODE_CEIL_DECLARE(IMUL_M, IMUL_R);
-	OPCODE_CEIL_DECLARE(IMULH_R, IMUL_M);
-	OPCODE_CEIL_DECLARE(IMULH_M, IMULH_R);
-	OPCODE_CEIL_DECLARE(ISMULH_R, IMULH_M);
-	OPCODE_CEIL_DECLARE(ISMULH_M, ISMULH_R);
-	OPCODE_CEIL_DECLARE(IMUL_RCP, ISMULH_M);
-	OPCODE_CEIL_DECLARE(INEG_R, IMUL_RCP);
-	OPCODE_CEIL_DECLARE(IXOR_R, INEG_R);
-	OPCODE_CEIL_DECLARE(IXOR_M, IXOR_R);
-	OPCODE_CEIL_DECLARE(IROR_R, IXOR_M);
-	OPCODE_CEIL_DECLARE(IROL_R, IROR_R);
-	OPCODE_CEIL_DECLARE(ISWAP_R, IROL_R);
-	OPCODE_CEIL_DECLARE(FSWAP_R, ISWAP_R);
-	OPCODE_CEIL_DECLARE(FADD_R, FSWAP_R);
-	OPCODE_CEIL_DECLARE(FADD_M, FADD_R);
-	OPCODE_CEIL_DECLARE(FSUB_R, FADD_M);
-	OPCODE_CEIL_DECLARE(FSUB_M, FSUB_R);
-	OPCODE_CEIL_DECLARE(FSCAL_R, FSUB_M);
-	OPCODE_CEIL_DECLARE(FMUL_R, FSCAL_R);
-	OPCODE_CEIL_DECLARE(FDIV_M, FMUL_R);
-	OPCODE_CEIL_DECLARE(FSQRT_R, FDIV_M);
-	OPCODE_CEIL_DECLARE(CBRANCH, FSQRT_R);
-	OPCODE_CEIL_DECLARE(CFROUND, CBRANCH);
-	OPCODE_CEIL_DECLARE(ISTORE, CFROUND);
-	OPCODE_CEIL_DECLARE(NOP, ISTORE);
+		constexpr int ceil_NULL = 0;
+        constexpr int ceil_IADD_RS = ceil_NULL + 16;
+        constexpr int ceil_IADD_M = ceil_IADD_RS + 7;
+        constexpr int ceil_ISUB_R = ceil_IADD_M + 16;
+        constexpr int ceil_ISUB_M = ceil_ISUB_R + 7;
+        constexpr int ceil_IMUL_R = ceil_ISUB_M + 16;
+        constexpr int ceil_IMUL_M = ceil_IMUL_R + 4;
+        constexpr int ceil_IMULH_R = ceil_IMUL_M + 4;
+        constexpr int ceil_IMULH_M = ceil_IMULH_R + 1;
+        constexpr int ceil_ISMULH_R = ceil_IMULH_M + 4;
+        constexpr int ceil_ISMULH_M = ceil_ISMULH_R + 1;
+        constexpr int ceil_IMUL_RCP = ceil_ISMULH_M + 8;
+        constexpr int ceil_INEG_R = ceil_IMUL_RCP + 2;
+        constexpr int ceil_IXOR_R = ceil_INEG_R + 15;
+        constexpr int ceil_IXOR_M = ceil_IXOR_R + 5;
+        constexpr int ceil_IROR_R = ceil_IXOR_M + 8;
+        constexpr int ceil_IROL_R = ceil_IROR_R + 2;
+        constexpr int ceil_ISWAP_R = ceil_IROL_R + 4;
+        constexpr int ceil_FSWAP_R = ceil_ISWAP_R + 4;
+        constexpr int ceil_FADD_R = ceil_FSWAP_R + 16;
+        constexpr int ceil_FADD_M = ceil_FADD_R + 5;
+        constexpr int ceil_FSUB_R = ceil_FADD_M + 16;
+        constexpr int ceil_FSUB_M = ceil_FSUB_R + 5;
+        constexpr int ceil_FSCAL_R = ceil_FSUB_M + 6;
+        constexpr int ceil_FMUL_R = ceil_FSCAL_R + 32;
+        constexpr int ceil_FDIV_M = ceil_FMUL_R + 4;
+        constexpr int ceil_FSQRT_R = ceil_FDIV_M + 6;
+        constexpr int ceil_CBRANCH = ceil_FSQRT_R + 25;
+        constexpr int ceil_CFROUND = ceil_CBRANCH + 1;
+        constexpr int ceil_ISTORE = ceil_CFROUND + 16;
+        constexpr int ceil_NOP = ceil_ISTORE + 0;
 #undef OPCODE_CEIL_DECLARE
 
-#define RANDOMX_EXE_ARGS InstructionByteCode& ibc, int& pc, uint8_t* scratchpad, ProgramConfiguration& config
-#define RANDOMX_GEN_ARGS Instruction& instr, int i, InstructionByteCode& ibc
+#define RANDOMX_EXE_ARGS                                               \
+          InstructionByteCode &ibc, int &pc, uint8_t *scratchpad,              \
+              ProgramConfiguration &config
+#define RANDOMX_GEN_ARGS                                               \
+          Instruction &instr, int i, InstructionByteCode &ibc
 
 	class BytecodeMachine;
 
@@ -123,10 +129,11 @@ namespace randomx {
 			}
 		}
 
-		static void executeBytecode(InstructionByteCode bytecode[RANDOMX_PROGRAM_SIZE], uint8_t* scratchpad, ProgramConfiguration& config) {
+		static void executeBytecode(InstructionByteCode bytecode[RANDOMX_PROGRAM_SIZE], uint8_t* scratchpad, ProgramConfiguration& config, NativeRegisterFile& nreg) {
 			for (int pc = 0; pc < RANDOMX_PROGRAM_SIZE; ++pc) {
 				auto& ibc = bytecode[pc];
 				executeInstruction(ibc, pc, scratchpad, config);
+				std::cout << "execute PC " << pc << " after bc in nreg.e[0]: " << nreg.e[0] << std::endl;
 			}
 		}
 
@@ -142,7 +149,14 @@ namespace randomx {
 
 		static void executeInstruction(RANDOMX_EXE_ARGS);
 
-		static void exe_IADD_RS(RANDOMX_EXE_ARGS) {
+#define RANDOMX_EXE_ARGS                                               \
+          InstructionByteCode &ibc, int &pc, uint8_t *scratchpad,              \
+              ProgramConfiguration &config
+
+		static void exe_IADD_RS(InstructionByteCode &ibc, int &pc, uint8_t *scratchpad,
+    ProgramConfiguration &config) {
+			auto a = (*ibc.isrc << ibc.shift) + ibc.imm;
+			std::cout << "IADD_RS idst " << *ibc.idst << " isrc " << *ibc.isrc << " a " << a << std::endl;
 			*ibc.idst += (*ibc.isrc << ibc.shift) + ibc.imm;
 		}
 
@@ -151,6 +165,9 @@ namespace randomx {
 		}
 
 		static void exe_ISUB_R(RANDOMX_EXE_ARGS) {
+			int64_t a = ~(0LL) + 1;
+			// std::cout << " ~(*ibc.idst) + 1 " << a << std::endl;
+			// std::cout << "*ibc.idst " << *ibc.idst << " *ibc.isrc " << *ibc.isrc << " *ibc.idst -= *ibc.isrc " << *ibc.idst - *ibc.isrc << std::endl;
 			*ibc.idst -= *ibc.isrc;
 		}
 
@@ -159,6 +176,7 @@ namespace randomx {
 		}
 
 		static void exe_IMUL_R(RANDOMX_EXE_ARGS) {
+			std::cout << "IMUL_R *ibc.idst " << *ibc.idst << " *ibc.isrc " << *ibc.isrc << " *ibc.idst * *ibc.isrc " << *ibc.idst * *ibc.isrc << std::endl;
 			*ibc.idst *= *ibc.isrc;
 		}
 
@@ -213,6 +231,10 @@ namespace randomx {
 		}
 
 		static void exe_FADD_R(RANDOMX_EXE_ARGS) {
+			auto a = *ibc.fdst;
+			auto b = *ibc.fsrc;
+			auto s = rx_add_vec_f128(a, b);
+			std::cout << "FADD_R *ibc.fdst " << *ibc.fdst << " *ibc.fsrc " << *ibc.fsrc << " s " << s << std::endl;
 			*ibc.fdst = rx_add_vec_f128(*ibc.fdst, *ibc.fsrc);
 		}
 
@@ -252,6 +274,7 @@ namespace randomx {
 		}
 
 		static void exe_CBRANCH(RANDOMX_EXE_ARGS) {
+			std::cout << "CBRANCH *ibc.idst " << *ibc.idst << " ibc.imm " << ibc.imm << std::endl;
 			*ibc.idst += ibc.imm;
 			if ((*ibc.idst & ibc.memMask) == 0) {
 				pc = ibc.target;

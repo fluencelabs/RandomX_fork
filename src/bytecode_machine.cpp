@@ -31,6 +31,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace randomx {
 
+	std::ostream& operator<<(std::ostream& os, const __m128d& value) {
+		union {
+			__m128d v;
+			double d[2];
+		} u;
+		u.v = value;
+		os << std::setprecision(15) << u.d[0] << " " << u.d[1];
+		return os;
+	}
+
+
 	const int_reg_t BytecodeMachine::zero = 0;
 
 #define INSTR_CASE(x) case InstructionType::x: \
@@ -38,48 +49,106 @@ namespace randomx {
 	break;
 
 	void BytecodeMachine::executeInstruction(RANDOMX_EXE_ARGS) {
+		std::cout << "executeInstruction " << ibc.type << std::endl;
 		switch (ibc.type)
 		{
-			INSTR_CASE(IADD_RS)
-			INSTR_CASE(IADD_M)
-			INSTR_CASE(ISUB_R)
-			INSTR_CASE(ISUB_M)
-			INSTR_CASE(IMUL_R)
-			INSTR_CASE(IMUL_M)
-			INSTR_CASE(IMULH_R)
-			INSTR_CASE(IMULH_M)
-			INSTR_CASE(ISMULH_R)
-			INSTR_CASE(ISMULH_M)
-			INSTR_CASE(INEG_R)
-			INSTR_CASE(IXOR_R)
-			INSTR_CASE(IXOR_M)
-			INSTR_CASE(IROR_R)
-			INSTR_CASE(IROL_R)
-			INSTR_CASE(ISWAP_R)
-			INSTR_CASE(FSWAP_R)
-			INSTR_CASE(FADD_R)
-			INSTR_CASE(FADD_M)
-			INSTR_CASE(FSUB_R)
-			INSTR_CASE(FSUB_M)
-			INSTR_CASE(FSCAL_R)
-			INSTR_CASE(FMUL_R)
-			INSTR_CASE(FDIV_M)
-			INSTR_CASE(FSQRT_R)
-			INSTR_CASE(CBRANCH)
-			INSTR_CASE(CFROUND)
-			INSTR_CASE(ISTORE)
+			case InstructionType ::IADD_RS:
+				exe_IADD_RS(ibc, pc, scratchpad, config);
+				break;
+			case InstructionType ::IADD_M:
+				exe_IADD_M(ibc, pc, scratchpad, config);
+				break;
+			case InstructionType ::ISUB_R:
+				exe_ISUB_R(ibc, pc, scratchpad, config);
+				break;
+			case InstructionType ::ISUB_M:
+				exe_ISUB_M(ibc, pc, scratchpad, config);
+				break;
+			case InstructionType ::IMUL_R:
+				exe_IMUL_R(ibc, pc, scratchpad, config);
+				break;
+			case InstructionType ::IMUL_M:
+				exe_IMUL_M(ibc, pc, scratchpad, config);
+				break;
+			case InstructionType ::IMULH_R:
+				exe_IMULH_R(ibc, pc, scratchpad, config);
+				break;
+			case InstructionType ::IMULH_M:
+				exe_IMULH_M(ibc, pc, scratchpad, config);
+				break;
+			case InstructionType ::ISMULH_R:
+				exe_ISMULH_R(ibc, pc, scratchpad, config);
+				break;
+			case InstructionType ::ISMULH_M:
+				exe_ISMULH_M(ibc, pc, scratchpad, config);
+				break;
+			case InstructionType ::INEG_R:
+				exe_INEG_R(ibc, pc, scratchpad, config);
+				break;
+			case InstructionType ::IXOR_R:
+				exe_IXOR_R(ibc, pc, scratchpad, config);
+				break;
+			case InstructionType ::IXOR_M:
+				exe_IXOR_M(ibc, pc, scratchpad, config);
+				break;
+			case InstructionType ::IROR_R:
+				exe_IROR_R(ibc, pc, scratchpad, config);
+				break;
+			case InstructionType ::IROL_R:
+				exe_IROL_R(ibc, pc, scratchpad, config);
+				break;
+			case InstructionType ::ISWAP_R:
+				exe_ISWAP_R(ibc, pc, scratchpad, config);
+				break;
+			case InstructionType ::FSWAP_R:
+				exe_FSWAP_R(ibc, pc, scratchpad, config);
+				break;
+			case InstructionType ::FADD_R:
+				exe_FADD_R(ibc, pc, scratchpad, config);
+				break;
+			case InstructionType ::FADD_M:
+				exe_FADD_M(ibc, pc, scratchpad, config);
+				break;
+			case InstructionType ::FSUB_R:
+				exe_FSUB_R(ibc, pc, scratchpad, config);
+				break;
+			case InstructionType ::FSUB_M:
+				exe_FSUB_M(ibc, pc, scratchpad, config);
+				break;
+			case InstructionType ::FSCAL_R:
+				exe_FSCAL_R(ibc, pc, scratchpad, config);
+				break;
+			case InstructionType ::FMUL_R:
+				exe_FMUL_R(ibc, pc, scratchpad, config);
+				break;
+			case InstructionType ::FDIV_M:
+				exe_FDIV_M(ibc, pc, scratchpad, config);
+				break;
+			case InstructionType ::FSQRT_R:
+				exe_FSQRT_R(ibc, pc, scratchpad, config);
+				break;
+			case InstructionType ::CBRANCH:
+				exe_CBRANCH(ibc, pc, scratchpad, config);
+				break;
+			case InstructionType ::CFROUND:
+				exe_CFROUND(ibc, pc, scratchpad, config);
+				break;
+			case InstructionType ::ISTORE:
+				exe_ISTORE(ibc, pc, scratchpad, config);
+				break;
 
-		case InstructionType::NOP:
-			break;
+			case InstructionType::NOP:
+				break;
 
-		case InstructionType::IMUL_RCP: //executed as IMUL_R
-		default:
-			UNREACHABLE;
+			case InstructionType::IMUL_RCP: // executed as IMUL_R
+			default:
+				UNREACHABLE;
 		}
 	}
 
-	void BytecodeMachine::compileInstruction(RANDOMX_GEN_ARGS) {
+	void BytecodeMachine::compileInstruction(Instruction &instr, int i, InstructionByteCode &ibc) {
 		int opcode = instr.opcode;
+		std::cout << "compile i " << i << " op " << (int) instr.opcode << std::endl;
 
 		if (opcode < ceil_IADD_RS) {
 			auto dst = instr.dst % RegistersCount;
@@ -96,6 +165,8 @@ namespace randomx {
 				ibc.shift = instr.getModShift();
 				ibc.imm = signExtend2sCompl(instr.getImm32());
 			}
+            // std::cout << "CEIL_IADD_RS dst: " << dst << " src: " << src << " imm32 " << instr.getImm32() << " signExtend2sCompl(instr.getImm32()) " << (uint64_t)(int64_t)(int32_t)(instr.getImm32()) << " ibc.imm " << ibc.imm << std::endl;
+
 			registerUsage[dst] = i;
 			return;
 		}
@@ -164,6 +235,8 @@ namespace randomx {
 				ibc.imm = signExtend2sCompl(instr.getImm32());
 				ibc.isrc = &ibc.imm;
 			}
+			std::cout << "CEIL_IMUL_R src " << src << " dst " << dst << " ibc.imm " << ibc.imm << std::endl;
+
 			registerUsage[dst] = i;
 			return;
 		}
@@ -250,11 +323,14 @@ namespace randomx {
 				ibc.idst = &nreg->r[dst];
 				ibc.imm = randomx_reciprocal(divisor);
 				ibc.isrc = &ibc.imm;
+				std::cout << "CEIL_IMUL_RCP " << " dst " << dst << " ibc.imm " << ibc.imm << std::endl;
+				
 				registerUsage[dst] = i;
 			}
 			else {
 				ibc.type = InstructionType::NOP;
 			}
+
 			return;
 		}
 
@@ -361,6 +437,7 @@ namespace randomx {
 		if (opcode < ceil_FADD_R) {
 			auto dst = instr.dst % RegisterCountFlt;
 			auto src = instr.src % RegisterCountFlt;
+			std::cout << "CEIL_FADD_R dst " << dst << " src " << src << std::endl;
 			ibc.type = InstructionType::FADD_R;
 			ibc.fdst = &nreg->f[dst];
 			ibc.fsrc = &nreg->a[src];
