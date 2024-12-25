@@ -100,7 +100,7 @@ namespace randomx {
 			mem.mx &= CacheLineAlignMask;
 			// WIP
 			// datasetPrefetch(datasetOffset + mem.mx);
-			// datasetRead(datasetOffset + mem.ma, nreg.r);
+			datasetRead(datasetOffset + mem.ma, nreg.r);
 			std::swap(mem.mx, mem.ma);
 
 			for (unsigned i = 0; i < RegistersCount; ++i)
