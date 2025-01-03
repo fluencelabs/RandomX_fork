@@ -121,19 +121,6 @@ namespace randomx {
 	template<class Allocator, bool softAes>
 	void VmBase<Allocator, softAes>::getFinalResult(void* out, size_t outSize) {
 		hashAes1Rx4<softAes>(scratchpad, ScratchpadSize, &reg.a);
-		std::cout << "getFinalResult reg.a[0]: " << reg.a[0].lo << " " << reg.a[0].hi << std::endl;
-		std::cout << "getFinalResult reg.a[1]: " << reg.a[1].lo << " " << reg.a[1].hi << std::endl;
-		std::cout << "getFinalResult reg.a[2]: " << reg.a[2].lo << " " << reg.a[2].hi << std::endl;
-		std::cout << "getFinalResult reg.a[3]: " << reg.a[3].lo << " " << reg.a[3].hi << std::endl;
-		std::cout << "getFinalResult reg.f[0]: " << reg.f[0].lo << " " << reg.f[0].hi << std::endl;
-		std::cout << "getFinalResult reg.f[1]: " << reg.f[1].lo << " " << reg.f[1].hi << std::endl;
-		std::cout << "getFinalResult reg.f[2]: " << reg.f[2].lo << " " << reg.f[2].hi << std::endl;
-		std::cout << "getFinalResult reg.f[3]: " << reg.f[3].lo << " " << reg.f[3].hi << std::endl;
-		std::cout << "getFinalResult reg.e[0]: " << reg.e[0].lo << " " << reg.e[0].hi << std::endl;
-		std::cout << "getFinalResult reg.e[1]: " << reg.e[1].lo << " " << reg.e[1].hi << std::endl;
-		std::cout << "getFinalResult reg.e[2]: " << reg.e[2].lo << " " << reg.e[2].hi << std::endl;
-		std::cout << "getFinalResult reg.e[3]: " << reg.e[3].lo << " " << reg.e[3].hi << std::endl;
-
 		blake2b(out, outSize, &reg, sizeof(RegisterFile), nullptr, 0);
 	}
 

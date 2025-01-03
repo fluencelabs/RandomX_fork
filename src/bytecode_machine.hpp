@@ -133,7 +133,6 @@ namespace randomx {
 			for (int pc = 0; pc < RANDOMX_PROGRAM_SIZE; ++pc) {
 				auto& ibc = bytecode[pc];
 				executeInstruction(ibc, pc, scratchpad, config);
-				std::cout << "execute PC " << pc << " after bc in nreg.e[0]: " << nreg.e[0] << std::endl;
 			}
 		}
 
@@ -155,8 +154,6 @@ namespace randomx {
 
 		static void exe_IADD_RS(InstructionByteCode &ibc, int &pc, uint8_t *scratchpad,
     ProgramConfiguration &config) {
-			auto a = (*ibc.isrc << ibc.shift) + ibc.imm;
-			std::cout << "IADD_RS idst " << *ibc.idst << " isrc " << *ibc.isrc << " a " << a << std::endl;
 			*ibc.idst += (*ibc.isrc << ibc.shift) + ibc.imm;
 		}
 
@@ -165,9 +162,6 @@ namespace randomx {
 		}
 
 		static void exe_ISUB_R(RANDOMX_EXE_ARGS) {
-			int64_t a = ~(0LL) + 1;
-			// std::cout << " ~(*ibc.idst) + 1 " << a << std::endl;
-			// std::cout << "*ibc.idst " << *ibc.idst << " *ibc.isrc " << *ibc.isrc << " *ibc.idst -= *ibc.isrc " << *ibc.idst - *ibc.isrc << std::endl;
 			*ibc.idst -= *ibc.isrc;
 		}
 
@@ -176,7 +170,6 @@ namespace randomx {
 		}
 
 		static void exe_IMUL_R(RANDOMX_EXE_ARGS) {
-			std::cout << "IMUL_R *ibc.idst " << *ibc.idst << " *ibc.isrc " << *ibc.isrc << " *ibc.idst * *ibc.isrc " << *ibc.idst * *ibc.isrc << std::endl;
 			*ibc.idst *= *ibc.isrc;
 		}
 
@@ -231,10 +224,6 @@ namespace randomx {
 		}
 
 		static void exe_FADD_R(RANDOMX_EXE_ARGS) {
-			auto a = *ibc.fdst;
-			auto b = *ibc.fsrc;
-			auto s = rx_add_vec_f128(a, b);
-			std::cout << "FADD_R *ibc.fdst " << *ibc.fdst << " *ibc.fsrc " << *ibc.fsrc << " s " << s << std::endl;
 			*ibc.fdst = rx_add_vec_f128(*ibc.fdst, *ibc.fsrc);
 		}
 
@@ -274,7 +263,6 @@ namespace randomx {
 		}
 
 		static void exe_CBRANCH(RANDOMX_EXE_ARGS) {
-			std::cout << "CBRANCH *ibc.idst " << *ibc.idst << " ibc.imm " << ibc.imm << std::endl;
 			*ibc.idst += ibc.imm;
 			if ((*ibc.idst & ibc.memMask) == 0) {
 				pc = ibc.target;

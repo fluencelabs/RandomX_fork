@@ -49,7 +49,7 @@ namespace randomx {
 	break;
 
 	void BytecodeMachine::executeInstruction(RANDOMX_EXE_ARGS) {
-		std::cout << "executeInstruction " << ibc.type << std::endl;
+		// std::cout << "executeInstruction " << ibc.type << std::endl;
 		switch (ibc.type)
 		{
 			case InstructionType ::IADD_RS:
@@ -148,7 +148,6 @@ namespace randomx {
 
 	void BytecodeMachine::compileInstruction(Instruction &instr, int i, InstructionByteCode &ibc) {
 		int opcode = instr.opcode;
-		std::cout << "compile i " << i << " op " << (int) instr.opcode << std::endl;
 
 		if (opcode < ceil_IADD_RS) {
 			auto dst = instr.dst % RegistersCount;
@@ -197,7 +196,7 @@ namespace randomx {
 			if (src != dst) {
 				ibc.isrc = &nreg->r[src];
 			}
-			else {
+			else { 
 				ibc.imm = signExtend2sCompl(instr.getImm32());
 				ibc.isrc = &ibc.imm;
 			}
@@ -235,7 +234,6 @@ namespace randomx {
 				ibc.imm = signExtend2sCompl(instr.getImm32());
 				ibc.isrc = &ibc.imm;
 			}
-			std::cout << "CEIL_IMUL_R src " << src << " dst " << dst << " ibc.imm " << ibc.imm << std::endl;
 
 			registerUsage[dst] = i;
 			return;
@@ -323,7 +321,6 @@ namespace randomx {
 				ibc.idst = &nreg->r[dst];
 				ibc.imm = randomx_reciprocal(divisor);
 				ibc.isrc = &ibc.imm;
-				std::cout << "CEIL_IMUL_RCP " << " dst " << dst << " ibc.imm " << ibc.imm << std::endl;
 				
 				registerUsage[dst] = i;
 			}
@@ -437,7 +434,6 @@ namespace randomx {
 		if (opcode < ceil_FADD_R) {
 			auto dst = instr.dst % RegisterCountFlt;
 			auto src = instr.src % RegisterCountFlt;
-			std::cout << "CEIL_FADD_R dst " << dst << " src " << src << std::endl;
 			ibc.type = InstructionType::FADD_R;
 			ibc.fdst = &nreg->f[dst];
 			ibc.fsrc = &nreg->a[src];

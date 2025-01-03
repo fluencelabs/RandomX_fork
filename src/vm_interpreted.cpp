@@ -33,21 +33,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cmath>
 #include <cfloat>
 #include "vm_interpreted.hpp"
+#include "configuration.h"
 #include "dataset.hpp"
 #include "intrin_portable.h"
 #include "reciprocal.h"
 
 namespace randomx {
-	// std::ostream& operator<<(std::ostream& os, const __m128d& value) {
-	// 	union {
-	// 		__m128d v;
-	// 		double d[2];
-	// 	} u;
-	// 	u.v = value;
-	// 	os << std::setprecision(15) << u.d[0] << " " << u.d[1];
-	// 	return os;
-	// }
-
 	template<class Allocator, bool softAes>
 	void InterpretedVm<Allocator, softAes>::setDataset(randomx_dataset* dataset) {
 		datasetPtr = dataset;
@@ -74,16 +65,17 @@ namespace randomx {
 		uint32_t spAddr0 = mem.mx;
 		uint32_t spAddr1 = mem.ma;
 
-		for(unsigned ic = 0; ic < 1; ++ic) {
+		for(unsigned ic = 0; ic < RANDOMX_PROGRAM_ITERATIONS; ++ic) {
 			uint64_t spMix = nreg.r[config.readReg0] ^ nreg.r[config.readReg1];
+
 			spAddr0 ^= spMix;
 			spAddr0 &= ScratchpadL3Mask64;
 			spAddr1 ^= spMix >> 32;
 			spAddr1 &= ScratchpadL3Mask64;
 			
+
 			for (unsigned i = 0; i < RegistersCount; ++i)
 				nreg.r[i] ^= load64(scratchpad + spAddr0 + 8 * i);
-			// std::cout << "execute init load in nreg.f[0]: " << nreg.f[0] << std::endl;
 
 			for (unsigned i = 0; i < RegisterCountFlt; ++i)
 				nreg.f[i] = rx_cvt_packed_int_vec_f128(scratchpad + spAddr1 + 8 * i);
@@ -91,23 +83,22 @@ namespace randomx {
 			for (unsigned i = 0; i < RegisterCountFlt; ++i) {
 				auto a = rx_cvt_packed_int_vec_f128(scratchpad + spAddr1 + 8 * (RegisterCountFlt + i));
 				nreg.e[i] = maskRegisterExponentMantissa(config, rx_cvt_packed_int_vec_f128(scratchpad + spAddr1 + 8 * (RegisterCountFlt + i)));
-				// std::cout << " init load in nreg.e[i] " << nreg.e[i] << " a " << a << " e_mask " << config.eMask[0] << " " << config.eMask[1] << std::endl;
 			}
 
 			executeBytecode(bytecode, scratchpad, config, nreg);
 			
 			mem.mx ^= nreg.r[config.readReg2] ^ nreg.r[config.readReg3];
 			mem.mx &= CacheLineAlignMask;
-			// WIP
-			// datasetPrefetch(datasetOffset + mem.mx);
+
+			datasetPrefetch(datasetOffset + mem.mx);
 			datasetRead(datasetOffset + mem.ma, nreg.r);
+
 			std::swap(mem.mx, mem.ma);
 
 			for (unsigned i = 0; i < RegistersCount; ++i)
 				store64(scratchpad + spAddr1 + 8 * i, nreg.r[i]);
 
 			for (unsigned i = 0; i < RegisterCountFlt; ++i) {
-				// std::cout << "execute before store in nreg.e[i] " << nreg.e[i] << " nreg.f[i]: " << nreg.f[i] << std::endl;
 				nreg.f[i] = rx_xor_vec_f128(nreg.f[i], nreg.e[i]);
 			}
 
@@ -120,24 +111,12 @@ namespace randomx {
 
 		for (unsigned i = 0; i < RegistersCount; ++i)
 			store64(&reg.r[i], nreg.r[i]);
-		// std::cout << "execute reg.r[0]: " << reg.r[0] << std::endl;
 
 		for (unsigned i = 0; i < RegisterCountFlt; ++i)
 			rx_store_vec_f128(&reg.f[i].lo, nreg.f[i]);
 
-		// std::cout << "execute after bc exec reg.f[0]: " << reg.f[0].lo << " " << reg.f[0].hi << std::endl;
-		// std::cout << "execute after bc exec reg.f[1]: " << reg.f[1].lo << " " << reg.f[1].hi << std::endl;
-		// std::cout << "execute after bc exec reg.f[2]: " << reg.f[2].lo << " " << reg.f[2].hi << std::endl;
-		// std::cout << "execute after bc exec reg.f[3]: " << reg.f[3].lo << " " << reg.f[3].hi << std::endl;
-
 		for (unsigned i = 0; i < RegisterCountFlt; ++i)
 			rx_store_vec_f128(&reg.e[i].lo, nreg.e[i]);
-	
-		// std::cout << "execute after bc exec reg.e[0]: " << reg.e[0].lo << " " << reg.e[0].hi << std::endl;
-		// std::cout << "execute after bc exec reg.e[1]: " << reg.e[1].lo << " " << reg.e[1].hi << std::endl;
-		// std::cout << "execute after bc exec reg.e[2]: " << reg.e[2].lo << " " << reg.e[2].hi << std::endl;
-		// std::cout << "execute after bc exec reg.e[3]: " << reg.e[3].lo << " " << reg.e[3].hi << std::endl;
-
 	}
 	
 	template<class Allocator, bool softAes>

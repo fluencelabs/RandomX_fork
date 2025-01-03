@@ -278,9 +278,7 @@ RANDOMX_EXPORT int randomx_blake2b(void *out, size_t outlen, const void *in, siz
 RANDOMX_EXPORT void randomx_fill_aes_1rx4(void *state, size_t outputSize, void *buffer);
 RANDOMX_EXPORT void randomx_fill_aes_4rx4(void *state, size_t outputSize, void *buffer);
 
-RANDOMX_EXPORT void randomx_reset_rounding_mode();
-
-RANDOMX_EXPORT void randomx_hash_aes_1rx4(void *input, size_t inputSize, void *hash);
+RANDOMX_EXPORT void randomx_hash_aes_1rx4(const void *input, size_t inputSize, void *hash);
 
 RANDOMX_EXPORT void randomx_init_dataset_item(randomx_cache* cache, void* out, uint64_t itemNumber);
 

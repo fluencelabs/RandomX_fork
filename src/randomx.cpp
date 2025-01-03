@@ -376,11 +376,11 @@ extern "C" {
 		assert(blakeResult == 0);
 		machine->initScratchpad(&tempHash);
 		machine->resetRoundingMode();
-		// for (int chain = 0; chain < RANDOMX_PROGRAM_COUNT - 1; ++chain) {
-		// 	machine->run(&tempHash);
-		// 	blakeResult = blake2b(tempHash, sizeof(tempHash), machine->getRegisterFile(), sizeof(randomx::RegisterFile), nullptr, 0);
-		// 	assert(blakeResult == 0);
-		// }
+		for (int chain = 0; chain < RANDOMX_PROGRAM_COUNT - 1; ++chain) {
+			machine->run(&tempHash);
+			blakeResult = blake2b(tempHash, sizeof(tempHash), machine->getRegisterFile(), sizeof(randomx::RegisterFile), nullptr, 0);
+			assert(blakeResult == 0);
+		}
 		machine->run(&tempHash);
 		machine->getFinalResult(output, RANDOMX_HASH_SIZE);
 
@@ -438,12 +438,8 @@ extern "C" {
 		fillAes4Rx4<false>(state, outputSize, buffer);
 	}
 
-	void randomx_hash_aes_1rx4(void *input, size_t inputSize, void *hash) {
+	void randomx_hash_aes_1rx4(const void *input, size_t inputSize, void *hash) {
 		return hashAes1Rx4<false>(input, inputSize, hash);
-	}
-
-	void randomx_reset_rounding_mode() {
-		rx_reset_float_state();
 	}
 
 	void randomx_init_dataset_item(randomx_cache* cache, void* out, uint64_t itemNumber) {
