@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vm_compiled.hpp"
 #include "vm_compiled_light.hpp"
 #include "blake2/blake2.h"
+#include "aes_hash.hpp"
 #include "cpu.hpp"
 #include <cassert>
 #include <limits>
@@ -428,4 +429,24 @@ extern "C" {
 		blake2b_update(&state, hash_in, RANDOMX_HASH_SIZE);
 		blake2b_final(&state, com_out, RANDOMX_HASH_SIZE);
 	}
+
+	void randomx_fill_aes_1rx4(void *state, size_t outputSize, void *buffer) {
+		fillAes1Rx4<false>(state, outputSize, buffer);
+	}
+
+	void randomx_fill_aes_4rx4(void *state, size_t outputSize, void *buffer) {
+		fillAes4Rx4<false>(state, outputSize, buffer);
+	}
+
+	void randomx_hash_aes_1rx4(const void *input, size_t inputSize, void *hash) {
+		return hashAes1Rx4<false>(input, inputSize, hash);
+	}
+
+	void randomx_init_dataset_item(randomx_cache* cache, void* out, uint64_t itemNumber) {
+		auto outPtr = static_cast<uint8_t*>(out); 
+		randomx::initDatasetItem(cache, outPtr, itemNumber);
+	}
+
+
+	
 }
